@@ -1,0 +1,231 @@
+# Overrides applied to the generated OpenAPI spec.
+#
+# The generator infers schemas and response types from the public API docs
+# (packagecloud-api.md), but the docs are incomplete or occasionally wrong
+# compared to the live API. Corrections here are derived empirically (see
+# ``audit_nullability.py``) or from obvious structural gaps the docs don't
+# cover.
+#
+# Top-level keys:
+#
+#   schemas:    Per-schema corrections under ``components.schemas``.
+#   operations: Per-operation corrections keyed by ``operationId``.
+#
+# ---------------------------------------------------------------------------
+# operations/<operationId> keys:
+#
+#   response_schema — a type expression in the docs' grammar (``ReadToken``,
+#                     ``Array<ReadToken>``, ``Hash<String, License>``), OR an
+#                     inline OpenAPI schema object. Replaces whatever the
+#                     normal resolver produced.
+#   pagination      — set to ``false`` to strip the auto-injected pagination
+#                     params/headers when empirical probing shows the endpoint
+#                     isn't actually paginated (server omits ``Total``).
+#
+# ---------------------------------------------------------------------------
+# schemas/<Name> keys — adds ``replace`` alongside the existing
+# nullable/optional/add_properties/remove_properties keys:
+#
+#   replace          — set the schema body to the provided dict verbatim.
+#                      Used when the docs' inferred shape is structurally
+#                      wrong (e.g. SeriesValue's wire format wraps the date
+#                      map in ``value``).
+#
+# ---------------------------------------------------------------------------
+# schemas/<Name> keys — every entry encodes positive evidence, i.e. something
+# we have observed in real responses. Absence of a key means "no evidence to
+# the contrary yet":
+#
+#   nullable          — observed null in at least one response.
+#   optional          — observed absent from at least one response (subtracted
+#                       from the default-required set).
+#   add_properties    — observed present but not declared in the docs;
+#                       added with the given sub-schema.
+#   remove_properties — declared in the docs but never observed in a
+#                       response; removed from the schema.
+#
+# The builder defaults every declared property to ``required``; `optional` is
+# how we record proof that a field can be absent. That way the spec stays
+# conservative by default and relaxations are backed by evidence.
+#
+# ---------------------------------------------------------------------------
+# operations/<operationId> keys:
+#
+#   response_schema — a type expression in the same grammar the docs use for
+#                     ``#### Response:`` lines (``ReadToken``,
+#                     ``Array<ReadToken>``, ``Hash<String, License>``, etc.).
+#                     Applied after the normal response resolver so it can
+#                     replace an inline-object schema with a named $ref.
+
+schemas:
+  PackageFragment:
+    # ``release``, ``epoch``, and ``architecture`` (deb-related fields on non-deb packages).
+    # ``sha256sum`` observed null on a recently uploaded jar
+    # (maybe Packagecloud calculates/stores checksums in the background, after upload?).
+    nullable:
+      - architecture
+      - epoch
+      - release
+      - sha256sum
+
+    # Present in every audited response but absent from the docs' Fields list.
+    add_properties:
+      download_url:
+        type: string
+        description: The direct download URL for this package (includes a read token).
+      sha256sum:
+        type: string
+        description: The SHA-256 checksum of the package file.
+
+    # The docs' example response used ``delete_url``, but live responses use
+    # ``destroy_url`` (also in the Fields list) and never emit ``delete_url``.
+    remove_properties:
+      - delete_url
+
+    # No `optional` list — across all audited repos every declared field was
+    # present in every response.
+
+  DistroVersion:
+    # The /api/v1/distributions payload (see dists.json) returns some
+    # DistroVersion entries with index_name/version_number null — e.g. a few
+    # older debian versions have no index_name, and some anyfile-style
+    # distros have no version_number.
+    nullable:
+      - index_name
+      - version_number
+
+  Repository:
+    # total_installs_count appears in the docs' example but not in any items I've seen.
+    optional:
+      - total_installs_count
+
+  PackageDetails:
+    # Empirically null across 54 PackageDetails samples covering deb/rpm/tgz/gem/whl/jar..
+    # Breakdown of which types send each field null:
+    #   summary               — some deb packages.
+    #   release, epoch        — non-rpm types (deb/gem/whl/jar/tgz).
+    #   architecture          — non-deb/rpm types (gem/whl/jar/tgz).
+    #   description           — gem/whl/jar.
+    #   dependencies          — gem/whl/jar + occasional rpm.
+    #   md5sum/sha1sum/
+    #   sha256sum/sha512sum   — jar (Maven artifacts expose no checksum?).
+    nullable:
+      - summary
+      - release
+      - architecture
+      - epoch
+      - dependencies
+      - description
+      - md5sum
+      - sha1sum
+      - sha256sum
+      - sha512sum
+
+  SeriesValue:
+    # The docs' example shows a bare date-keyed map (``{"20160221Z": 22, …}``)
+    # but the live response actually wraps it in a ``value`` key.
+    replace:
+      type: object
+      properties:
+        value:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Map from ISO8601 date-hour strings to the count for that window.
+      required:
+        - value
+
+operations:
+  # Docs declare the response as "Hash" (unhelpful); the real shape is the
+  # synthesized License type.
+  licenses_index:
+    response_schema: License
+
+  # Docs have no "#### Response:" line, but the example ``{id, value, name}``
+  # matches the ReadToken schema exactly.
+  read_tokens_show:
+    response_schema: ReadToken
+
+  # Wire format wraps the array in ``{"gpg_keys": [...]}`` — not a bare
+  # array as the docs' Response line claims. No ``Total`` header is sent, so
+  # the endpoint isn't actually paginated either.
+  gpg_keys_index:
+    response_schema:
+      type: object
+      properties:
+        gpg_keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/GPGKey'
+      required:
+        - gpg_keys
+    pagination: false
+
+  # Same pattern as gpg_keys_index — wrapped in a ``read_tokens`` key and
+  # not paginated on the wire.
+  read_tokens_index:
+    response_schema:
+      type: object
+      properties:
+        read_tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadToken'
+      required:
+        - read_tokens
+    pagination: false
+
+  # No Total header on the wire — packagecloud doesn't paginate the master
+  # tokens list regardless of size.
+  master_tokens_index:
+    pagination: false
+
+  # ``show`` endpoint returns a single item wrapped in a 1-element array —
+  # no pagination applies.
+  master_tokens_show:
+    pagination: false
+
+  # Series endpoints advertise pagination in their Note section but the
+  # response is a single ``{value: {date: count}}`` object with no Total
+  # header on the wire. Remove the auto-injected pagination params/headers.
+  stats_downloads_series_debian_redhat:
+    pagination: false
+  stats_downloads_series_gem:
+    pagination: false
+  stats_downloads_series_python:
+    pagination: false
+  stats_downloads_series_node_js:
+    pagination: false
+  # The docs' Response lines on the three ``installs_series`` variants say
+  # ``[RepositoryInstalls] JSON object …`` but the example response is a
+  # date-keyed hash — i.e. a SeriesValue. The live response confirms the
+  # SeriesValue shape (wrapped in ``value``) and shows no Total header.
+  stats_installs_series_all:
+    response_schema: SeriesValue
+    pagination: false
+  stats_installs_series_by_distro:
+    response_schema: SeriesValue
+    pagination: false
+  stats_installs_series_by_distro_and_version:
+    response_schema: SeriesValue
+    pagination: false
+
+  # The ``*_detail`` endpoints return a paginated list of events (hence the
+  # Note: section mentioning pagination). The docs' example shows a single
+  # record only, but the described semantics ("details of ALL downloads /
+  # installs that match…") plus pagination headers on the response imply an
+  # array of that record type.
+  stats_downloads_detail_debian_redhat:
+    response_schema: Array<PackageDownloads>
+  stats_downloads_detail_gem:
+    response_schema: Array<PackageDownloads>
+  stats_downloads_detail_python:
+    response_schema: Array<PackageDownloads>
+  stats_downloads_detail_node_js:
+    response_schema: Array<PackageDownloads>
+  stats_installs_detail_all:
+    response_schema: Array<RepositoryInstalls>
+  stats_installs_detail_by_distro:
+    response_schema: Array<RepositoryInstalls>
+  stats_installs_detail_by_distro_and_version:
+    response_schema: Array<RepositoryInstalls>

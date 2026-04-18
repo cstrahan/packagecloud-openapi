@@ -1,0 +1,5510 @@
+openapi: 3.1.0
+info:
+  title: packagecloud API
+  version: 1.0.0
+  description: REST API for managing packagecloud repositories. Generated from https://packagecloud.io/docs/api.
+servers:
+- url: https://packagecloud.io
+security:
+- apiToken: []
+tags:
+- name: distributions
+- name: gpg_keys
+- name: licenses
+- name: master_tokens
+- name: packages
+- name: read_tokens
+- name: repositories
+- name: stats
+- name: api_tokens
+paths:
+  /api/v1/distributions:
+    get:
+      operationId: distributions_index
+      tags:
+      - distributions
+      summary: index
+      description: |-
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/distributions.json
+        ```
+      responses:
+        '200':
+          description: Hash<String, Distribution> The response will be a JSON hash with the keys "deb",
+            "dsc", and "rpm" whose values will be an array of hashes describing each distribution. This
+            distribution hash will have an key called "versions" whose value is an array of JSON hashes
+            describing each version of a particular Linux distribution which supports the package type.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Distribution'
+              example:
+                deb:
+                - display_name: Ubuntu
+                  index_name: ubuntu
+                  versions:
+                  - id: 4
+                    display_name: 5.10 Breezy Badger
+                    index_name: breezy
+                  - id: 5
+                    display_name: 6.06 LTS Dapper Drake
+                    index_name: dapper
+                  - id: 6
+                    display_name: 6.10 Edgy Eft
+                    index_name: edgy
+                - display_name: Debian
+                  index_name: debian
+                  versions:
+                  - id: 22
+                    display_name: 4.0 etch
+                    index_name: etch
+  /api/v1/repos/{user_id}/{repo}/gpg_keys.json:
+    get:
+      operationId: gpg_keys_index
+      tags:
+      - gpg_keys
+      summary: index
+      description: |-
+        List gpg keys for a repository.
+
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos/username/reponame/gpg_keys.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Array<GPGKey> An array of GPG key objects that belong to this repository.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gpg_keys:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GPGKey'
+                required:
+                - gpg_keys
+              example:
+                gpg_keys:
+                - self: /api/v1/repos/username/reponame/gpg_keys/username-reponame-85D7FBF915DFCBC6.pub.gpg.json
+                  download_url: https://packagecloud.io/username/reponame/gpgkey/username-reopname-85D7FBF915DFCBC6.pub.gpg
+                  keytype: repo
+                  destroy_url: /api/v1/repos/username/reponame/gpg_keys/username-reponame-85D7FBF915DFCBC6.pub.gpg.json
+                  fingerprint: 26F67F3E5E89BB30DCD7AC6E85D7FBF915DFCBC6
+                  name: username-reponame-85D7FBF915DFCBC6.pub.gpg
+    post:
+      operationId: gpg_keys_create
+      tags:
+      - gpg_keys
+      summary: create
+      description: |-
+        Create a GPG key.
+
+        **Example request:**
+
+        ```
+        curl -X POST -F "gpg_key[keydata]=@/path/to/key.gpg" https://packagecloud.io/api/v1/repos/username/reponame/gpg_keys.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                gpg_key[keydata]:
+                  type: string
+                  format: binary
+                  description: The GPG key file to use when creating a key.
+      responses:
+        '201':
+          description: '[GPGKey](#object_GPGKey) The newly created GPG key object.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPGKey'
+              example:
+                self: /api/v1/repos/username/reponame/gpg_keys/username-reopname-85D7FBF915DFCBC6.pub.gpg.json
+                download_url: https://packagecloud.io/username/reponame/gpgkey/username-reopname-85D7FBF915DFCBC6.pub.gpg
+                fingerprint: 26F67F3E5E89BB30DCD7AC6E85D7FBF915DFCBC6
+                keytype: package
+                name: username-reponame-85D7FBF915DFCBC6.pub.gpg
+                destroy_url: /api/v1/repos/username/reponame/gpg_keys/username-reponame-85D7FBF915DFCBC6.pub.gpg.json
+  /api/v1/repos/{user_id}/{repo}/gpg_keys/{keyname}.json:
+    delete:
+      operationId: gpg_keys_destroy
+      tags:
+      - gpg_keys
+      summary: destroy
+      description: |-
+        Destroy a GPG key
+
+        **Example request:**
+
+        ```
+        curl -X DELETE https://packagecloud.io/api/v1/repos/username/reponame/gpg_keys/username-reponame-85D7FBF915DFCBC6.pub.gpg.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: keyname
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The GPG Key keyname to delete
+      responses:
+        '204':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+    get:
+      operationId: gpg_keys_show
+      tags:
+      - gpg_keys
+      summary: show
+      description: |-
+        View a single GPG Key
+
+        **Example request:**
+
+        ```
+        curl -X GET https://packagecloud.io/api/v1/repos/username/reponame/gpg_keys/username-reponame-85D7FBF915DFCBC6.pub.gpg.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: keyname
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The GPG Key keyname.
+      responses:
+        '200':
+          description: <GPGKey> The GPG Key object representing the requested key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPGKey'
+              example:
+                self: /api/v1/repos/username/reponame/gpg_keys/username-reopname-85D7FBF915DFCBC6.pub.gpg.json
+                download_url: https://packagecloud.io/username/reponame/gpgkey/username-reopname-85D7FBF915DFCBC6.pub.gpg
+                fingerprint: 26F67F3E5E89BB30DCD7AC6E85D7FBF915DFCBC6
+                keytype: package
+                name: username-reponame-85D7FBF915DFCBC6.pub.gpg
+                destroy_url: /api/v1/repos/username/reponame/gpg_keys/username-reponame-85D7FBF915DFCBC6.pub.gpg.json
+  /api/v1/licenses/{license_key}/license.json:
+    get:
+      operationId: licenses_index
+      tags:
+      - licenses
+      summary: index
+      description: |-
+        STILL IN USE BY GITLAB
+        Retrieve a packagecloud:enterprise license file and GPG signature.
+        Signature can be verified with the packagecloud GPG key:
+        <https://packagecloud.io/gpg.key>.
+
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/licenses/aabbccddeeffaa/license.json
+        ```
+      parameters:
+      - name: license_key
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The packagecloud:enterprise license key
+      responses:
+        '200':
+          description: Hash JSON hash containing the license data and GPG signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/License'
+  /api/v1/repos/{user_id}/{repo}/master_tokens:
+    get:
+      operationId: master_tokens_index
+      tags:
+      - master_tokens
+      summary: index
+      description: |-
+        List master tokens for a repo.
+
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos/username/reponame/master_tokens
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      responses:
+        '200':
+          description: Array<MasterToken> An array of master token objects that belong to this repository.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MasterToken'
+              example:
+              - value: e5480f5b38f1f78de2aaa0fa732d1427b1b83113371fd97d
+                name: default
+                read_tokens:
+                - value: 3fe453060fd7f017219e308eb98ccf273b4c3655ba57577a
+                  name: app1.someservice.com
+                paths:
+                  self: /api/v1/repos/username/reponame/master_tokens/1
+    post:
+      operationId: master_tokens_create
+      tags:
+      - master_tokens
+      summary: create
+      description: |-
+        Create a master token.
+
+        **Example request:**
+
+        ```
+        curl -X POST -F "master_token[name]=app_servers" https://packagecloud.io/api/v1/repos/username/reponame/master_tokens
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                master_token[name]:
+                  type: string
+                  description: The name of the token to create.
+      responses:
+        '201':
+          description: '[MasterToken](#object_MasterToken) The newly created master token'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MasterToken'
+              example:
+                value: 1f3311f78de2aaa0fa732d1427b1b83113371fd97d
+                name: app_servers
+                paths:
+                  self: /api/v1/repos/username/reponame/master_tokens/1
+  /api/v1/repos/{user_id}/{repo}/master_tokens/search:
+    get:
+      operationId: master_tokens_search
+      tags:
+      - master_tokens
+      summary: search
+      description: |-
+        Search for master tokens
+
+        Default is 30 per page, see response headers for [pagination](#pagination) information.
+
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos/username/reponame/master_tokens/search?q=prod
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The name of the MasterToken.
+      responses:
+        '200':
+          description: Array<MasterTokensResult> An array of {MasterTokensResult} objects for this search
+            query.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MasterTokensResult'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/master_tokens/{id}:
+    get:
+      operationId: master_tokens_show
+      tags:
+      - master_tokens
+      summary: show
+      description: |-
+        Show a master token.
+
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos/username/reponame/master_tokens/1
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id or value of the MasterToken.
+      responses:
+        '200':
+          description: Array The name and value of the master token and API path for associated Read Tokens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    name:
+                      type: string
+                    read_tokens_url:
+                      type: string
+              example:
+              - value: e5480f5b38f1f78de2aaa0fa732d1427b1b83113371fd97d
+                name: default
+                read_tokens_url: /api/v1/repos/username/reponame/master_tokens/1/read_tokens
+    delete:
+      operationId: master_tokens_destroy
+      tags:
+      - master_tokens
+      summary: destroy
+      description: |-
+        Destroy a master token and all of its read token children.
+
+        NOTE: Default tokens have their token value rotated when used with this
+        API. All private repositories must have default master tokens.
+
+        **Example request:**
+
+        ```
+        curl -X DELETE https://packagecloud.io/api/v1/repos/username/reponame/master_tokens/1
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id of the master token to be destroyed.
+      responses:
+        '204':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/v1/repos/{user_id}/{repo}/packages/contents.json:
+    post:
+      operationId: packages_contents
+      tags:
+      - packages
+      summary: contents
+      description: |-
+        Inspect the contents of a debian source package.
+
+        **Example request:**
+
+        ```
+        curl -X POST                                                  \
+             -F "package[distro_version_id]=17"                       \
+             -F "package[package_file]=@path/to/jake_1.0-7.dsc"             \
+                "https://packagecloud.io/api/v1/repos/test_user/test_repo/packages/contents.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                package[distro_version_id]:
+                  type: integer
+                  description: The id of the DistroVersion to push this package to. Get this from the
+                    distributions endpoint.
+                package[package_file]:
+                  type: string
+                  format: binary
+                  description: The `.dsc` file to inspect the contents of.
+      responses:
+        '200':
+          description: PackageContents A JSON object with a `files` key containing an array of files referenced
+            in this source package.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageContents'
+              example:
+                files:
+                - filename: jake_1.0.orig.tar.bz2
+                  size: 1108
+                  md5sum: a7a309b55424198ee98abcb8092d7be0
+                - filename: jake_1.0-7.debian.tar.gz
+                  size: 1571
+                  md5sum: 0fa5395e95ddf846b419e96575ce8044
+  /api/v1/repos/{user_id}/{repo}/packages.json:
+    post:
+      operationId: packages_create
+      tags:
+      - packages
+      summary: create
+      description: |-
+        Push a package.
+
+        NOTE: that for Deban .dsc packages, you must upload each of the files contained in the .dsc.
+        You can use the package\_contents API to determine the filename, md5sum, and size of the files referenced by the DSC.
+        All other package types (debian, rpm, python, and java) need only specify the distro\_version\_id and package\_file parameters.
+
+        **Example request:**
+
+        ```
+        curl -X POST https://packagecloud.io/api/v1/repos/test_user/test_repo/packages.json \
+             -F "package[distro_version_id]=48"     \
+             -F "package[package_file]=@path/to/jake-1.0-1.el6.x86_64.rpm"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                package[distro_version_id]:
+                  type: integer
+                  description: The id of the DistroVersion to push this package to. Get this from the
+                    distributions endpoint. Not required for rubygems.
+                package[package_file]:
+                  type: string
+                  format: binary
+                  description: The package file.
+                package[source_files][]:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 'For debian source packages only: the source files that are specified in
+                    the .dsc.'
+                package[coordinates]:
+                  type: string
+                  description: 'For Maven/Java/Android packages only: the coordinates of this artifact
+                    if they cannot be computed from metadata within the package.'
+      responses:
+        '201':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: jake
+                distro_version: fedora/22
+                architecture: x86_64
+                repository: test_repo
+                size: '3712'
+                summary: jake douglas is a very nice young man.
+                filename: jake-1.0-1.el6.x86_64.rpm
+                description: as it so happens, jake douglas is a very nice young man.
+                dependencies:
+                - context: requires
+                  dependencies:
+                  - libc.so.6(GLIBC_2.2.5)(64bit)
+                  - rtld(GNU_HASH)
+                md5sum: 5abe922fc4bbf5bbdac9b85173371892
+                sha1sum: 062fd41ecf96587309ec9a3ae2035cc44c348b8f
+                sha256sum: 070da5370a96ba3ae679e7d02d7de6309e4d159340d9f3b555d6d5b4b7cf260a
+                sha512sum: 406fa288d5dfff194ec2b119b798c4658375a5d07b34f2d6350885cdf6b620f3fdeee45427fef8bcd37e6624049fba0c633b5b4030b79bf96028db6b4f01de87
+                private: false
+                uploader_name: test_user
+                created_at: '2017-03-13T02:49:29.000Z'
+                licenses:
+                - GPL
+                version: '1.0'
+                release: 1.el6
+                epoch: 0
+                indexed: false
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm/download
+                package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+                destroy_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                self_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+    get:
+      operationId: packages_all
+      tags:
+      - packages
+      summary: all
+      description: |-
+        List All Packages (not grouped by package version)
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/packages.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of PackageFragment objects.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+              example:
+              - name: jake
+                distro_version: fedora/22
+                created_at: '2017-03-13T02:49:29.000Z'
+                version: '1.0'
+                release: 1.el6
+                epoch: 0
+                private: false
+                type: rpm
+                filename: jake-1.0-1.el6.x86_64.rpm
+                uploader_name: test_user
+                indexed: false
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+                package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                download_url: https://packagecloud.io/test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm/download
+                promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+              - name: jake
+                distro_version: java/maven2
+                created_at: '2017-03-13T23:54:48.000Z'
+                version: '2.3'
+                release: null
+                epoch: null
+                private: false
+                type: java
+                filename: jake-2.3.jar
+                uploader_name: test_user
+                indexed: true
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/java/maven2/io.packagecloud/jake/2.3.json
+                downloads_detail_url: N/A
+                downloads_series_url: N/A
+                downloads_count_url: N/A
+                package_html_url: /test_user/test_repo/packages/java/jake-2.3.jar
+                download_url: https://packagecloud.io/test_user/test_repo/packages/java/io.packagecloud/jake-2.3.jar/artifacts/jake-2.3.jar/download
+                promote_url: /api/v1/repos/test_user/test_repo/java/maven2/io.packagecloud/jake-2.3.jar/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/java/maven2/io.packagecloud/jake-2.3.jar
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/{distro}/{version}/{package}/promote.json:
+    post:
+      operationId: packages_promote
+      tags:
+      - packages
+      summary: promote
+      description: |-
+        Promote a package.
+
+        This API is similar to a move operation. Once this API call completes
+        successfull, the package being promoted will only exist in the
+        destination.
+
+        The `dependencies` array for Debian packages will list dependencies for the following contexts: `depends`, `recommends`, `suggests`, `enhances`, `pre-depends`
+
+        The `dependencies` array for Debian Source packages (DSC) will list dependencies for the following contexts: `build-depends` and `build-depends-indep`
+
+        The `dependencies` array for Node.js packages will list dependencies for the following contexts: `dependencies`, `devDependencies`,
+        `optionalDependencies`, `bundleDependencies`, and `peerDependencies`.
+
+        The `dependencies` array for Node.js packages will list dependencies for the following contexts: `dependencies`, `devDependencies`,
+        `optionalDependencies`, `bundleDependencies`, and `peerDependencies`.
+
+        **Example request:**
+
+        ```
+        curl -X POST                                \
+             -F "destination=julio/testrepo"        \
+             "https://packagecloud.io/api/v1/repos/user/example-repo/el/7/jake-1.0-3.el6.x86_64.rpm/promote.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution the package is in. (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution the package is in. (i.e. precise)
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The full name of the package.
+      - name: scope
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The scope of the Node.JS package to promote. Only required if the package to promote
+          is scoped. Include the escaped '@' (i.e. ?scope=%40example).
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                destination:
+                  type: string
+                  description: The fully qualified repository name (e.g., "user/repo") to move the package.
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: jake
+                distro_version: fedora/22
+                architecture: x86_64
+                repository: test_repo
+                size: '3712'
+                summary: jake douglas is a very nice young man.
+                filename: jake-1.0-1.el6.x86_64.rpm
+                description: as it so happens, jake douglas is a very nice young man.
+                dependencies:
+                - context: requires
+                  dependencies:
+                  - libc.so.6(GLIBC_2.2.5)(64bit)
+                  - rtld(GNU_HASH)
+                md5sum: 5abe922fc4bbf5bbdac9b85173371892
+                sha1sum: 062fd41ecf96587309ec9a3ae2035cc44c348b8f
+                sha256sum: 070da5370a96ba3ae679e7d02d7de6309e4d159340d9f3b555d6d5b4b7cf260a
+                sha512sum: 406fa288d5dfff194ec2b119b798c4658375a5d07b34f2d6350885cdf6b620f3fdeee45427fef8bcd37e6624049fba0c633b5b4030b79bf96028db6b4f01de87
+                private: false
+                uploader_name: test_user
+                created_at: '2017-03-13T02:49:29.000Z'
+                licenses:
+                - GPL
+                version: '1.0'
+                release: 1.el6
+                epoch: 0
+                indexed: false
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm/download
+                package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+                destroy_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                self_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+  /api/v1/repos/{user_id}/{repo}/package/{type}/{distro}/{version}/{package}/{arch}/{package_version}/{release}.json:
+    get:
+      operationId: packages_show
+      tags:
+      - packages
+      summary: show
+      description: |-
+        Show Package
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        The `dependencies` array for RPM packages will list all `Requires` and `PreReq` values under the context `requires`
+
+        The `dependencies` array for Debian packages will list dependencies for the following contexts: `depends`, `recommends`, `suggests`, `enhances`, `pre-depends`
+
+        The `dependencies` array for Debian Source packages (DSC) will list dependencies for the following contexts: `build-depends` and `build-depends-indep`
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The type of package it is, "rpm" or "deb".
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution the package is in. (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution the package is in. (i.e. precise)
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - name: arch
+        in: path
+        required: true
+        schema:
+          type: string
+        description: 'The architecture of the package. (note: debs use amd64 while rpms use x86\_64 for
+          arch)'
+      - name: package_version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version (without epoch) of the package.
+      - name: release
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: jake
+                distro_version: fedora/22
+                architecture: x86_64
+                repository: test_repo
+                size: '3712'
+                summary: jake douglas is a very nice young man.
+                filename: jake-1.0-1.el6.x86_64.rpm
+                description: as it so happens, jake douglas is a very nice young man.
+                dependencies:
+                - context: requires
+                  dependencies:
+                  - libc.so.6(GLIBC_2.2.5)(64bit)
+                  - rtld(GNU_HASH)
+                md5sum: 5abe922fc4bbf5bbdac9b85173371892
+                sha1sum: 062fd41ecf96587309ec9a3ae2035cc44c348b8f
+                sha256sum: 070da5370a96ba3ae679e7d02d7de6309e4d159340d9f3b555d6d5b4b7cf260a
+                sha512sum: 406fa288d5dfff194ec2b119b798c4658375a5d07b34f2d6350885cdf6b620f3fdeee45427fef8bcd37e6624049fba0c633b5b4030b79bf96028db6b4f01de87
+                private: false
+                uploader_name: test_user
+                created_at: '2017-03-13T02:49:29.000Z'
+                licenses:
+                - GPL
+                version: '1.0'
+                release: 1.el6
+                epoch: 0
+                indexed: false
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm/download
+                package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+                destroy_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                self_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+  /api/v1/repos/{user_id}/{repo}/package/anyfile/{package}/{version}.json:
+    get:
+      operationId: packages_anyfile_show
+      tags:
+      - packages
+      summary: anyfile_show
+      description: |-
+        Show Anyfile Package
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/anyfile/hello/0.0.6.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version of the package.
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: hello
+                distro_version: anyfile/1
+                architecture: null
+                repository: test_repo
+                size: '659'
+                summary: null
+                filename: hello-0.0.6.asc
+                description: 'null'
+                dependencies: null
+                md5sum: 63f15a3efcf982d610b0376aae0a40fe
+                sha1sum: 0080db94bb9b3fbfae2ae2c9a720d5cf7a724bbc
+                sha256sum: f101e1f32d7e4863c3e983b3709fe1755a34a8f45184ef507868267c23f76f0e
+                sha512sum: b50259b470eb609688fd99b30db7e6664e5bf3e47e43266a34e321b928b8c687dc11e9d461d4eb980697a17bb96a8cde197ea755396e25a831d78deeab696061
+                private: false
+                uploader_name: test_user
+                created_at: '2017-03-14T15:58:49.000Z'
+                licenses: null
+                version: 0.0.6
+                release: null
+                epoch: null
+                indexed: false
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/anyfile/hello/0.0.6.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/anyfile/hello/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/anyfile/1/hello-0.0.6.asc/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/anyfile/hello-0.0.6.asc/download?distro_version_id=129
+                package_html_url: /test_user/test_repo/packages/anyfile/hello-0.0.6.asc
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/anyfile/hello/0.0.6/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/anyfile/anyfile/hello/0.0.6/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/anyfile/hello/0.0.6/stats/downloads/count.json
+                destroy_url: /api/v1/repos/test_user/test_repo/anyfile/1/hello-0.0.6.asc
+                self_url: /api/v1/repos/test_user/test_repo/package/anyfile/hello/0.0.6.json
+  /api/v1/repos/{user_id}/{repo}/package/gem/{package}/{version}.json:
+    get:
+      operationId: packages_gem_show
+      tags:
+      - packages
+      summary: gem_show
+      description: |-
+        Show RubyGem Package
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        The `dependencies` array for RubyGem packages will list dependencies for the following contexts: `runtime` and `development`
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/julio/testrepo/package/gem/jakedotrb/0.0.1.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version of the package.
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: jakedotrb
+                distro_version: RubyGem
+                architecture: null
+                repository: test_repo
+                size: '3072'
+                summary: helping people learn about my friend jake douglas.
+                filename: jakedotrb-0.0.1.gem
+                description: helping people learn about my friend jake douglas.
+                dependencies: null
+                md5sum: 448024a4ac0b6244659c707cfa070df6
+                sha1sum: c4365658774d8c259885471acb6cc659caca16b9
+                sha256sum: 1897be32375d4fc3337df00930ab94afbdfeb26545492127bdbe7fe05e7e1e9d
+                sha512sum: 27f6286aa047a5c1dd5c7c80e1cf1eccc8ca9c8a61a17cc552277d0d6d745275523fa6cdac610d6a6abb9091509241de447b673e84ead83947f3378641e11217
+                private: false
+                uploader_name: test_user
+                created_at: '2017-03-14T14:31:16.000Z'
+                licenses:
+                - MIT
+                version: 0.0.1
+                release: null
+                epoch: null
+                indexed: false
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/gems/jakedotrb-0.0.1.gem/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/gems/jakedotrb-0.0.1.gem/download
+                package_html_url: /test_user/test_repo/packages/gems/jakedotrb-0.0.1.gem
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/count.json
+                destroy_url: /api/v1/repos/test_user/test_repo/gems/jakedotrb-0.0.1.gem
+                self_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1.json
+  /api/v1/repos/{user_id}/{repo}/package/python/{package}/{version}.json:
+    get:
+      operationId: packages_python_show
+      tags:
+      - packages
+      summary: python_show
+      description: |-
+        Show Python Package
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        The `dependencies` array for Python packages will list dependencies for the following contexts: `requires`, `requires-dist`, `requires-external`, `requires-extra`, and `requires-python`
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version of the package.
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: packagecloud-test
+                distro_version: python
+                architecture: null
+                repository: test_repo
+                size: '3128'
+                summary: A sample Python project
+                filename: packagecloud_test-0.9.7b1-py2.py3-none-any.whl
+                description: A sample Python project for pushing to packagecloud
+                dependencies: null
+                md5sum: a47e28fef7602f51f296a533eb081fff
+                sha1sum: 25416aa58f9a5e7a6be23e084c6cbfdd392ab3b2
+                sha256sum: f114202a20cacaf3a0de65752a3ae9da963047567323ce2fedaeb8a5b0f7fe63
+                sha512sum: 592aecff82aaf416eed0c038b83c71c9e9f85a2300437636dec0a4ffcf813a3b82eb1c0cbcbbbc61f1d784da6ad3609de4e313c2bbcff46b2b6eaf29197d1fe7
+                private: false
+                uploader_name: test_user
+                created_at: '2017-03-14T15:58:49.000Z'
+                licenses: null
+                version: 0.9.7b1
+                release: null
+                epoch: null
+                indexed: false
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/python/1/packagecloud_test-0.9.7b1-py2.py3-none-any.whl/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/python/packagecloud_test-0.9.7b1-py2.py3-none-any.whl/download
+                package_html_url: /test_user/test_repo/packages/python/packagecloud_test-0.9.7b1-py2.py3-none-any.whl
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1/stats/downloads/count.json
+                destroy_url: /api/v1/repos/test_user/test_repo/python/1/packagecloud_test-0.9.7b1-py2.py3-none-any.whl
+                self_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1.json
+  /api/v1/repos/{user_id}/{repo}/package/java/maven2/{package}/{version}.json:
+    get:
+      operationId: packages_java_show
+      tags:
+      - packages
+      summary: java_show
+      description: |-
+        Show Java Package
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/java/maven2/io.packagecloud/jake/2.3.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version of the package.
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+  /api/v1/repos/{user_id}/{repo}/package/helm/{index_name}/{package}/{version}.json:
+    get:
+      operationId: packages_helm_show
+      tags:
+      - packages
+      summary: helm_show
+      description: |-
+        Show Helm Package
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/helm/v1/hello-kubernetes/2.0.0.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: index_name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version of helm index
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version of the package.
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: hello-kubernetes
+                distro_version: helm/v1
+                architecture: null
+                repository: test_repo
+                size: '1877'
+                summary: A sample Helm chart
+                filename: hello-kubernetes-2.0.0.tgz.
+                description: A sample Helm chart
+                dependencies: []
+                md5sum: 797df36c5c713768cf660b6d29895ca6
+                sha1sum: 4f6bab7bd2f6da189506f2e11032b46945dd74b0
+                sha256sum: 52d7800b708cb3c96493accf9b15e8bceba9ac31a3fbbe6fde9f176e503bddbe
+                sha512sum: dbfe5a1bdf9d7fb4b9cfbff373526fc840d68cce19b17000d751223af21f3a1de1d6230458b14d57eb96eb19a9ab1390542f9081849b0f606870984a7a5fb06c
+                private: false
+                uploader_name: test_user
+                created_at: '2017-03-14T15:58:49.000Z'
+                licenses: null
+                version: 2.0.0
+                release: null
+                epoch: null
+                indexed: true
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/helm/v1/hello-kubernetes/2.0.0.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/helm/v1/hello-kubernetes/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/helm/v1/hello-kubernetes-2.0.0.tgz/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/helm/v1/hello-kubernetes-2.0.0.tgz/download?distro_version_id=140
+                package_html_url: /test_user/test_repo/packages/helm/v1/hello-kubernetes-2.0.0.tgz
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/helm/v1/hello-kubernetes/2.0.0/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/helm/v1/hello-kubernetes/2.0.0/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/helm/v1/hello-kubernetes/2.0.0/stats/downloads/count.jsom
+                destroy_url: /api/v1/repos/test_user/test_repo/helm/v1/hello-kubernetes-2.0.0.tgz
+                self_url: /api/v1/repos/test_user/test_repo/package/helm/v1/hello-kubernetes/2.0.0.json
+  /api/v1/repos/{user_id}/{repo}/package/{type}/{distro}/{version}/{package}/{arch}/versions.json:
+    get:
+      operationId: packages_versions
+      tags:
+      - packages
+      summary: versions
+      description: |-
+        List Package Versions
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/versions.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The type of package it is, "rpm" or "deb".
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution the package is in. (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution the package is in. (i.e. precise)
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - name: arch
+        in: path
+        required: true
+        schema:
+          type: string
+        description: 'The architecture of the package. (note: debs use amd64 while rpms use x86\_64 for
+          arch)'
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of all the versions for
+            this package'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+              example:
+              - name: jake
+                distro_version: fedora/22
+                created_at: '2017-03-13T02:49:29.000Z'
+                version: '1.0'
+                release: 1.el6
+                epoch: 0
+                private: false
+                type: rpm
+                filename: jake-1.0-1.el6.x86_64.rpm
+                uploader_name: test_user
+                indexed: false
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+                package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                download_url: https://packagecloud.io/test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm/download
+                promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/gem/{package}/versions.json:
+    get:
+      operationId: packages_gem_versions
+      tags:
+      - packages
+      summary: gem_versions
+      description: |-
+        List RubyGem Package Versions
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/gem/jakedotrb/versions.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of all the versions for
+            this package.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+              example:
+              - name: jakedotrb
+                distro_version: RubyGem
+                created_at: '2017-03-14T14:31:16.000Z'
+                version: 0.0.1
+                release: null
+                epoch: null
+                private: false
+                type: gem
+                filename: jakedotrb-0.0.1.gem
+                uploader_name: test_user
+                indexed: false
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1.json
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/count.json
+                package_html_url: /test_user/test_repo/packages/gems/jakedotrb-0.0.1.gem
+                download_url: https://packagecloud.io/test_user/test_repo/packages/gems/jakedotrb-0.0.1.gem/download
+                promote_url: /api/v1/repos/test_user/test_repo/gems/jakedotrb-0.0.1.gem/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/gems/jakedotrb-0.0.1.gem
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/node/{package}/{version}.json:
+    get:
+      operationId: packages_node_show
+      tags:
+      - packages
+      summary: node_show
+      description: |-
+        Show Node.js Package
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        The `dependencies` array for Node.js packages will list dependencies for the following contexts: `dependencies`, `devDependencies`,
+        `optionalDependencies`, `bundleDependencies`, and `peerDependencies`.
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If this is a scoped package, the name should include an
+          @ and an escaped '/' (e.g., @scope%2Fpkg-name).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version of the package.
+      responses:
+        '200':
+          description: '[PackageDetails](#object_PackageDetails) A JSON object representing the package'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageDetails'
+              example:
+                name: test-pkg
+                distro_version: node/1
+                architecture: null
+                repository: test_repo
+                size: '691'
+                summary: null
+                filename: test-pkg-1.3.1.tgz
+                description: test description
+                dependencies:
+                - context: dependency
+                  dependencies:
+                  - express
+                - context: peerDependency
+                  dependencies:
+                  - tea
+                md5sum: b7037cbf8a54d73eeef32f9e73d2139e
+                sha1sum: 6be6783461d5d3a57d56a0c87388bf42c04c1b55
+                sha256sum: d71e85ca552011c6f811bc176e799bd777f4608c6a5f268b326ab95613145eeb
+                sha512sum: 3e9f904bedeaa3c4dd461570f7c788e3a53783176c39ca16f2f40852777fad24980bcda567ea142f731a4def2bc659d6f021526c08aed76e512194515c2af829
+                private: false
+                uploader_name: test_user
+                created_at: '2017-12-19T03:11:21.000Z'
+                licenses: null
+                version: 1.3.1
+                release: null
+                epoch: null
+                indexed: true
+                scope: null
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1.json
+                versions_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/versions.json
+                promote_url: /api/v1/repos/test_user/test_repo/node/1/test-pkg-1.3.1.tgz/promote.json
+                total_downloads_count: 0
+                download_url: https://packagecloud.io/test_user/test_repo/packages/node/test-pkg-1.3.1.tgz/download
+                package_html_url: /test_user/test_repo/packages/node/test-pkg-1.3.1.tgz
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1/stats/downloads/count.json
+                destroy_url: /api/v1/repos/test_user/test_repo/node/1/test-pkg-1.3.1.tgz
+                self_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1.json
+  /api/v1/repos/{user_id}/{repo}/package/node/{package}/versions.json:
+    get:
+      operationId: packages_node_versions
+      tags:
+      - packages
+      summary: node_versions
+      description: |-
+        List Node.js Package Versions
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/node/test-pkg/versions.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If this is a scoped package, the name should include an
+          @ and an escaped '/' (e.g., @scope%2Fpkg-name).
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of all the versions for
+            this package.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+              example:
+              - name: test-pkg
+                distro_version: node/1
+                created_at: '2017-12-19T03:11:21.000Z'
+                version: 1.3.1
+                release: null
+                epoch: null
+                scope: null
+                private: false
+                type: node
+                filename: test-pkg-1.3.1.tgz
+                uploader_name: test_user
+                indexed: true
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1.json
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/node/test-pkg/1.3.1/stats/downloads/count.json
+                package_html_url: /test_user/test_repo/packages/node/test-pkg-1.3.1.tgz
+                download_url: https://packagecloud.io/test_user/test_repo/packages/node/test-pkg-1.3.1.tgz/download
+                promote_url: /api/v1/repos/test_user/test_repo/node/1/test-pkg-1.3.1.tgz/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/node/1/test-pkg-1.3.1.tgz
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/python/{package}/versions.json:
+    get:
+      operationId: packages_python_versions
+      tags:
+      - packages
+      summary: python_versions
+      description: |-
+        List Python Package Versions
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/python/packagecloud-test/versions.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of all the versions for
+            this package.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+              example:
+              - name: packagecloud-test
+                distro_version: python
+                created_at: '2017-03-14T15:58:49.000Z'
+                version: 0.9.7b1
+                release: null
+                epoch: null
+                private: false
+                type: python
+                filename: packagecloud_test-0.9.7b1-py2.py3-none-any.whl
+                uploader_name: test_user
+                indexed: false
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1.json
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/python/packagecloud-test/0.9.7b1/stats/downloads/count.json
+                package_html_url: /test_user/test_repo/packages/python/packagecloud_test-0.9.7b1-py2.py3-none-any.whl
+                download_url: https://packagecloud.io/test_user/test_repo/packages/python/packagecloud_test-0.9.7b1-py2.py3-none-any.whl/download
+                promote_url: /api/v1/repos/test_user/test_repo/python/1/packagecloud_test-0.9.7b1-py2.py3-none-any.whl/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/python/1/packagecloud_test-0.9.7b1-py2.py3-none-any.whl
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/java/maven2/{group}/{package}/versions.json:
+    get:
+      operationId: packages_java_versions
+      tags:
+      - packages
+      summary: java_versions
+      description: |-
+        List Java Package Versions
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/java/maven2/io.packagecloud/jake/versions.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: group
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The group of the package.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of all the versions for
+            this package.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+              example:
+              - name: jake
+                distro_version: java/maven2
+                created_at: '2017-03-13T23:54:48.000Z'
+                version: '2.3'
+                release: null
+                epoch: null
+                private: false
+                type: java
+                filename: jake-2.3.jar
+                uploader_name: test_user
+                indexed: true
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/java/maven2/io.packagecloud/jake/2.3.json
+                downloads_detail_url: N/A
+                downloads_series_url: N/A
+                downloads_count_url: N/A
+                package_html_url: /test_user/test_repo/packages/java/jake-2.3.jar
+                download_url: https://packagecloud.io/test_user/test_repo/packages/java/io.packagecloud/jake-2.3.jar/artifacts/jake-2.3.jar/download
+                promote_url: /api/v1/repos/test_user/test_repo/java/maven2/io.packagecloud/jake-2.3.jar/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/java/maven2/io.packagecloud/jake-2.3.jar
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/anyfile/{package}/versions.json:
+    get:
+      operationId: packages_anyfile_versions
+      tags:
+      - packages
+      summary: anyfile_versions
+      description: |-
+        List Anyfile Package Versions
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/package/anyfile/hello/versions.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of all the versions for
+            this package.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/packages/{type}/{distro}/{version}/{arch}.json:
+    get:
+      operationId: packages_index
+      tags:
+      - packages
+      summary: index
+      description: |-
+        List Packages by type, distribution, version, and architecture, grouped by package version
+
+        **Example request:**
+
+        ```
+         curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/packages/rpm.json"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The type of package it is, "rpm" or "deb".
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution the package is in. (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution the package is in. (i.e. precise)
+      - name: arch
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: '[PackageVersion](#object_PackageVersion) A JSON array of all packages that match
+            the criteria.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageVersion'
+              example:
+              - name: jake
+                versions_count: 1
+                versions_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/versions.json
+                repository_url: /api/v1/repos/test_user/test_repo
+                repository_html_url: /test_user/test_repo
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/gems/{package}.gem:
+    delete:
+      operationId: packages_destroy_gem
+      tags:
+      - packages
+      summary: destroy_gem
+      description: |-
+        **Example request:**
+
+        ```
+        curl -X DELETE "https://packagecloud.io/api/v1/repos/cooluser/mystuff/gems/jake-1.0.0.gem"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The owner of the repo.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package to be yanked.
+      responses:
+        '200':
+          description: Empty An empty JSON hash.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+  /api/v1/repos/{user_id}/{repo}/java/maven2/{group}/{filename}:
+    delete:
+      operationId: packages_destroy_java
+      tags:
+      - packages
+      summary: destroy_java
+      description: |-
+        **Example request:**
+
+        ```
+        curl -X DELETE "https://packagecloud.io/api/v1/repos/test_user/test_repo/java/maven2/io.packagecloud/jake-2.3.jar"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The owner of the repo.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: group
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the group this package belongs to.
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The filename of the package to be yanked.
+      responses:
+        '200':
+          description: Empty An empty JSON hash.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+  /api/v1/repos/{user_id}/{repo}/{distro}/{version}/{package}.{ext}:
+    delete:
+      operationId: packages_destroy
+      tags:
+      - packages
+      summary: destroy
+      description: |-
+        **Example request:**
+
+        ```
+        curl -X DELETE "https://packagecloud.io/api/v1/repos/cooluser/mystuff/ubuntu/precise/jake_1.0-7.dsc"
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The owner of the repo.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution the package is in. (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution the package is in. (i.e. precise)
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package to be yanked.
+      - name: ext
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The file extension of the package to be yanked.
+      - name: scope
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The package scope. Required if deleting a scoped Node.JS package. Include the escaped
+          '@', (i.e. ?scope=%40example).
+      responses:
+        '200':
+          description: Empty An empty JSON hash.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+  /api/v1/repos/{user_id}/{repo}/search.json:
+    get:
+      operationId: packages_search
+      tags:
+      - packages
+      summary: search
+      description: |-
+        Pass pagination information using the following headers listed here:
+
+        **Example request:**
+
+        ```
+        curl "https://packagecloud.io/api/v1/repos/test_user/test_repo/search?q="
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: arch
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The architecture of the packages. (i.e. x86\_64, arm64, amd64) - Alpine/RPM/Debian
+          only.
+      - name: dist
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The name of the distribution the package is in. (i.e. ubuntu, el/6) - Overrides [:filter]
+      - name: filter
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Search by package type (RPMs, Debs, DSCs, Gem, Python, Node) - Ignored when [:dist]
+          is present.
+      - $ref: '#/components/parameters/pageParam'
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The number of packages to return from the results set. If nothing passed, default
+          is 30
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The query string to search for package filename. If empty string is passed, all packages
+          are returned
+      responses:
+        '200':
+          description: '[PackageFragment](#object_PackageFragment) A JSON array of PackageFragment objects
+            hat match the query parameters.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageFragment'
+              example:
+              - name: jakedotrb
+                distro_version: RubyGem
+                created_at: '2017-03-14T14:31:16.000Z'
+                version: 0.0.1
+                release: null
+                epoch: null
+                private: false
+                type: gem
+                filename: jakedotrb-0.0.1.gem
+                uploader_name: test_user
+                indexed: false
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1.json
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/gem/jakedotrb/0.0.1/stats/downloads/count.json
+                package_html_url: /test_user/test_repo/packages/gems/jakedotrb-0.0.1.gem
+                download_url: https://packagecloud.io/test_user/test_repo/packages/gems/jakedotrb-0.0.1.gem/download
+                promote_url: /api/v1/repos/test_user/test_repo/gems/jakedotrb-0.0.1.gem/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/gems/jakedotrb-0.0.1.gem
+              - name: jake
+                distro_version: fedora/22
+                created_at: '2017-03-13T02:49:29.000Z'
+                version: '1.0'
+                release: 1.el6
+                epoch: 0
+                private: false
+                type: rpm
+                filename: jake-1.0-1.el6.x86_64.rpm
+                uploader_name: test_user
+                indexed: false
+                repository_html_url: /test_user/test_repo
+                package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+                downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+                downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+                downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+                package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+                download_url: https://packagecloud.io/test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm/download
+                promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+                destroy_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/master_tokens/{master_token}/read_tokens.json:
+    get:
+      operationId: read_tokens_index
+      tags:
+      - read_tokens
+      summary: index
+      description: |-
+        List read tokens for a master token.
+
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos/username/reponame/master_tokens/123/read_tokens.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: master_token
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The value or id of the master\_token.
+      responses:
+        '200':
+          description: Array<ReadToken> An array of read token objects that belong to this repository.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  read_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReadToken'
+                required:
+                - read_tokens
+              example:
+                read_tokens:
+                - id: 1234
+                  value: 3fe453060fd7f017219e308eb98ccf273b4c3655ba57577a
+                  name: app1.someservice.com
+    post:
+      operationId: read_tokens_create
+      tags:
+      - read_tokens
+      summary: create
+      description: |-
+        Create a read token.
+
+        **Example request:**
+
+        ```
+        curl -X POST -F "read_token[name]=tokename" https://packagecloud.io/api/v1/repos/username/reponame/master_tokens/123/read_tokens.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: master_token
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The value or id of the master\_token.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                read_token[name]:
+                  type: string
+                  description: The name of the token to create.
+      responses:
+        '201':
+          description: '[ReadToken](#object_ReadToken) The newly created read token object.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadToken'
+              example:
+                name: tokenname
+                value: ea6eef3f26bdcaa5a10ed32b5f8262dbad233900b2571a1c
+  /api/v1/repos/{user_id}/{repo}/master_tokens/{master_token}/read_tokens/{id}:
+    delete:
+      operationId: read_tokens_destroy
+      tags:
+      - read_tokens
+      summary: destroy
+      description: |-
+        Destroy a read token
+
+        **Example request:**
+
+        ```
+        curl -X DELETE https://packagecloud.io/api/v1/repos/username/reponame/master_tokens/123/read_tokens/33
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: master_token
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The value or id of the master\_token.
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id of the read token to be destroyed.
+      responses:
+        '204':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+    get:
+      operationId: read_tokens_show
+      tags:
+      - read_tokens
+      summary: show
+      description: |-
+        View a single read token
+
+        **Example request:**
+
+        ```
+        curl -X GET https://packagecloud.io/api/v1/repos/username/reponame/master_tokens/123/read_tokens/33
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username to which the repo belongs.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      - name: master_token
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The value or id of the master\_token.
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id of the read token to view
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadToken'
+              example:
+                id: 1234
+                value: 3fe453060fd7f017219e308eb98ccf273b4c3655ba57577a
+                name: app1.someservice.com
+  /api/v1/repos:
+    get:
+      operationId: repositories_index
+      tags:
+      - repositories
+      summary: index
+      description: |-
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos
+        ```
+      parameters:
+      - name: include_collaborations
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Include to return Repository objects from
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      responses:
+        '200':
+          description: Array<Repository> An array of Repository objects that belong to your account.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Repository'
+              example:
+              - name: myrepo
+                created_at: '2014-02-26T00:03:28.000Z'
+                url: https://packagecloud.io/cooluser/myrepo
+                last_push_human: 3 days ago
+                package_count_human: 17 packages
+                private: false
+                fqname: cooluser/myrepo
+              - name: myrepo2
+                created_at: '2014-03-25T19:16:26.000Z'
+                url: https://packagecloud.io/cooluser/myrepo2
+                last_push_human: 6 days ago
+                package_count_human: 3 packages
+                private: false
+                fqname: cooluser/myrepo2
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+    post:
+      operationId: repositories_create
+      tags:
+      - repositories
+      summary: create
+      description: |-
+        **Example request:**
+
+        ```
+        curl -X POST                                                  \
+             -H "Content-Type: application/json"                      \
+             -d '{"repository": {"name": "thename", "private": "1"}}' \
+             "https://packagecloud.io/api/v1/repos.json"
+        ```
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    private:
+                      type: string
+            example:
+              repository:
+                name: thename
+                private: '1'
+      responses:
+        '201':
+          description: String The URL of the new repository resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+              example:
+                url: https://packagecloud.io/cooluser/thename
+  /api/v1/repos/{user_id}/{name}:
+    get:
+      operationId: repositories_show
+      tags:
+      - repositories
+      summary: show
+      description: |-
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos/cooluser/myrepo
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username of the owner.
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repo.
+      responses:
+        '200':
+          description: '[Repository](#object_Repository) The repository object'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repository'
+              example:
+                name: myrepo
+                created_at: '2014-02-26T00:03:28.000Z'
+                url: https://packagecloud.io/cooluser/myrepo
+                last_push_human: 3 days ago
+                package_count_human: 17 packages
+                private: false
+                fqname: cooluser/myrepo
+  /api/v1/repos/{user_id}/{repo}/packages_with_bk_required_attributes:
+    get:
+      operationId: repositories_packages_with_bk_required_attributes
+      tags:
+      - repositories
+      summary: packages_with_bk_required_attributes
+      description: |-
+        **Example request:**
+
+        ```
+        curl https://packagecloud.io/api/v1/repos/cooluser/myrepo/packages_with_bk_required_attributes
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: anyfile_attr_fix
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: True/False
+      - name: repository_uuid
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The UUID of the repository
+      responses:
+        '200':
+          description: Array Array of packages with storage usage, blob, and ecosystem-specific attributes
+          content:
+            application/json:
+              schema:
+                type: object
+  ? /api/v1/repos/{user_id}/{repo}/package/{type}/{distro}/{version}/{package}/{arch}/{package_version}/{release}/stats/downloads/count.json
+  : get:
+      operationId: stats_downloads_count_debian_redhat
+      tags:
+      - stats
+      summary: downloads_count (debian/redhat)
+      description: |-
+        Retrieve the number of times a particular package has been downloaded given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/count.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: arch
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: package_version
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: release
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[CountValue](#object_CountValue) JSON object containing the value of the result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountValue'
+              example:
+                value: 5135
+  /api/v1/repos/{user_id}/{repo}/package/gem/{package}/{version}/stats/downloads/count.json:
+    get:
+      operationId: stats_downloads_count_gem
+      tags:
+      - stats
+      summary: downloads_count (gem)
+      description: |-
+        Retrieve the number of times a particular package has been downloaded given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/count.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[CountValue](#object_CountValue) JSON object containing the value of the result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountValue'
+              example:
+                value: 5135
+  /api/v1/repos/{user_id}/{repo}/package/python/{package}/{version}/stats/downloads/count.json:
+    get:
+      operationId: stats_downloads_count_python
+      tags:
+      - stats
+      summary: downloads_count (python)
+      description: |-
+        Retrieve the number of times a particular package has been downloaded given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/count.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[CountValue](#object_CountValue) JSON object containing the value of the result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountValue'
+              example:
+                value: 5135
+  /api/v1/repos/{user_id}/{repo}/package/node/{package}/{version}/stats/downloads/count.json:
+    get:
+      operationId: stats_downloads_count_node_js
+      tags:
+      - stats
+      summary: downloads_count (node.js)
+      description: |-
+        Retrieve the number of times a particular package has been downloaded given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/count.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[CountValue](#object_CountValue) JSON object containing the value of the result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountValue'
+              example:
+                value: 5135
+  ? /api/v1/repos/{user_id}/{repo}/package/{type}/{distro}/{version}/{package}/{arch}/{package_version}/{release}/stats/downloads/detail.json
+  : get:
+      operationId: stats_downloads_detail_debian_redhat
+      tags:
+      - stats
+      summary: downloads_detail (debian/redhat)
+      description: |-
+        Retrieve the details of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Repository owners only
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/detail.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: arch
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: package_version
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: release
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli."
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[PackageDownloads](#object_PackageDownloads) JSON object containing details of
+            all downloads'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageDownloads'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/gem/{package}/{version}/stats/downloads/detail.json:
+    get:
+      operationId: stats_downloads_detail_gem
+      tags:
+      - stats
+      summary: downloads_detail (gem)
+      description: |-
+        Retrieve the details of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Repository owners only
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/detail.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli."
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[PackageDownloads](#object_PackageDownloads) JSON object containing details of
+            all downloads'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageDownloads'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/python/{package}/{version}/stats/downloads/detail.json:
+    get:
+      operationId: stats_downloads_detail_python
+      tags:
+      - stats
+      summary: downloads_detail (python)
+      description: |-
+        Retrieve the details of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Repository owners only
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/detail.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli."
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[PackageDownloads](#object_PackageDownloads) JSON object containing details of
+            all downloads'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageDownloads'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/package/node/{package}/{version}/stats/downloads/detail.json:
+    get:
+      operationId: stats_downloads_detail_node_js
+      tags:
+      - stats
+      summary: downloads_detail (node.js)
+      description: |-
+        Retrieve the details of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Repository owners only
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/detail.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 ending date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli."
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[PackageDownloads](#object_PackageDownloads) JSON object containing details of
+            all downloads'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageDownloads'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  ? /api/v1/repos/{user_id}/{repo}/package/{type}/{distro}/{version}/{package}/{arch}/{package_version}/{release}/stats/downloads/series/{interval}.json
+  : get:
+      operationId: stats_downloads_series_debian_redhat
+      tags:
+      - stats
+      summary: downloads_series (debian/redhat)
+      description: |-
+        Retrieve a time series of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/series/daily.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: arch
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: package_version
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: release
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: interval
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 end date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[SeriesValue](#object_SeriesValue) JSON object containing details of all downloads'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeriesValue'
+              example:
+                20160221Z: 22
+                20160222Z: 21
+                20160223Z: 29
+                20160224Z: 19
+                20160225Z: 30
+                20160226Z: 38
+                20160227Z: 40
+  /api/v1/repos/{user_id}/{repo}/package/gem/{package}/{version}/stats/downloads/series/{interval}.json:
+    get:
+      operationId: stats_downloads_series_gem
+      tags:
+      - stats
+      summary: downloads_series (gem)
+      description: |-
+        Retrieve a time series of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/series/daily.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: interval
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 end date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[SeriesValue](#object_SeriesValue) JSON object containing details of all downloads'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeriesValue'
+              example:
+                20160221Z: 22
+                20160222Z: 21
+                20160223Z: 29
+                20160224Z: 19
+                20160225Z: 30
+                20160226Z: 38
+                20160227Z: 40
+  /api/v1/repos/{user_id}/{repo}/package/python/{package}/{version}/stats/downloads/series/{interval}.json:
+    get:
+      operationId: stats_downloads_series_python
+      tags:
+      - stats
+      summary: downloads_series (python)
+      description: |-
+        Retrieve a time series of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/series/daily.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: interval
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 end date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[SeriesValue](#object_SeriesValue) JSON object containing details of all downloads'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeriesValue'
+              example:
+                20160221Z: 22
+                20160222Z: 21
+                20160223Z: 29
+                20160224Z: 19
+                20160225Z: 30
+                20160226Z: 38
+                20160227Z: 40
+  /api/v1/repos/{user_id}/{repo}/package/node/{package}/{version}/stats/downloads/series/{interval}.json:
+    get:
+      operationId: stats_downloads_series_node_js
+      tags:
+      - stats
+      summary: downloads_series (node.js)
+      description: |-
+        Retrieve a time series of all the downloads for a particular package given a
+        particular criteria. This is specific to a single package inside a repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        Instead of constructing these URLs by hand, you should use the generated versions
+        returned from any of these API's, which are guaranteed to be correct for all supported package types:
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/package/gem/my-gem/1.2.0/stats/downloads/series/daily.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: package
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the package. If the package is a scoped Node.JS package include the scope
+          and an escaped '/' (e.g. @scope%2Fname).
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version number of the package.
+      - name: interval
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 end date (e.g., 20160231Z).
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter downloads by.
+      - name: read_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The read\_token name or id to filter downloads by (:master\_token required).
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The source to filter downloads by, must be "web" or "cli"
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: An ISO8601 starting date (e.g., 20160231Z).
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter downloads by.
+      responses:
+        '200':
+          description: '[SeriesValue](#object_SeriesValue) JSON object containing details of all downloads'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeriesValue'
+              example:
+                20160221Z: 22
+                20160222Z: 21
+                20160223Z: 29
+                20160224Z: 19
+                20160225Z: 30
+                20160226Z: 38
+                20160227Z: 40
+  /api/v1/repos/{user_id}/{repo}/stats/installs/count.json:
+    get:
+      operationId: stats_installs_count_all
+      tags:
+      - stats
+      summary: installs_count (all)
+      description: |-
+        Retrieve the number of times a particular repository has been installed given a
+        particular criteria. This is specific to a single repository.
+
+        Default date range is 7 days ago.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/count.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      responses:
+        '200':
+          description: '[CountValue](#object_CountValue) JSON object containing the value of the result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountValue'
+              example:
+                value: 5135
+  /api/v1/repos/{user_id}/{repo}/stats/installs/{distro}/count.json:
+    get:
+      operationId: stats_installs_count_by_distro
+      tags:
+      - stats
+      summary: installs_count (by distro)
+      description: |-
+        Retrieve the number of times a particular repository has been installed given a
+        particular criteria. This is specific to a single repository.
+
+        Default date range is 7 days ago.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/count.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      responses:
+        '200':
+          description: '[CountValue](#object_CountValue) JSON object containing the value of the result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountValue'
+              example:
+                value: 5135
+  /api/v1/repos/{user_id}/{repo}/stats/installs/{distro}/{version}/count.json:
+    get:
+      operationId: stats_installs_count_by_distro_and_version
+      tags:
+      - stats
+      summary: installs_count (by distro and version)
+      description: |-
+        Retrieve the number of times a particular repository has been installed given a
+        particular criteria. This is specific to a single repository.
+
+        Default date range is 7 days ago.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/count.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      responses:
+        '200':
+          description: '[CountValue](#object_CountValue) JSON object containing the value of the result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountValue'
+              example:
+                value: 5135
+  /api/v1/repos/{user_id}/{repo}/stats/installs/detail.json:
+    get:
+      operationId: stats_installs_detail_all
+      tags:
+      - stats
+      summary: installs_detail (all)
+      description: |-
+        Retrieve the details of all repository installations that match a
+        particular criteria. This is specific to a single repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Repository owners only
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/detail.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      responses:
+        '200':
+          description: '[RepositoryInstalls](#object_RepositoryInstalls) JSON object containing the details
+            of repository installs.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RepositoryInstalls'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/stats/installs/{distro}/detail.json:
+    get:
+      operationId: stats_installs_detail_by_distro
+      tags:
+      - stats
+      summary: installs_detail (by distro)
+      description: |-
+        Retrieve the details of all repository installations that match a
+        particular criteria. This is specific to a single repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Repository owners only
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/detail.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      responses:
+        '200':
+          description: '[RepositoryInstalls](#object_RepositoryInstalls) JSON object containing the details
+            of repository installs.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RepositoryInstalls'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/stats/installs/{distro}/{version}/detail.json:
+    get:
+      operationId: stats_installs_detail_by_distro_and_version
+      tags:
+      - stats
+      summary: installs_detail (by distro and version)
+      description: |-
+        Retrieve the details of all repository installations that match a
+        particular criteria. This is specific to a single repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Repository owners only
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/detail.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/perPageParam'
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      responses:
+        '200':
+          description: '[RepositoryInstalls](#object_RepositoryInstalls) JSON object containing the details
+            of repository installs.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RepositoryInstalls'
+          headers:
+            Link:
+              $ref: '#/components/headers/LinkHeader'
+            Total:
+              $ref: '#/components/headers/TotalHeader'
+            Per-Page:
+              $ref: '#/components/headers/PerPageHeader'
+            Max-Per-Page:
+              $ref: '#/components/headers/MaxPerPageHeader'
+  /api/v1/repos/{user_id}/{repo}/stats/installs/series/{interval}.json:
+    get:
+      operationId: stats_installs_series_all
+      tags:
+      - stats
+      summary: installs_series (all)
+      description: |-
+        Retrieve a time series of all the repository installs that match a
+        particular criteria for a give time period. This is specific to a single repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/series/weekly.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: interval
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      - name: distro
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      responses:
+        '200':
+          description: '[RepositoryInstalls](#object_RepositoryInstalls) JSON object containing the details
+            of repository installs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeriesValue'
+              example:
+                20160221Z: 22
+                20160222Z: 21
+                20160223Z: 29
+                20160224Z: 19
+                20160225Z: 30
+                20160226Z: 38
+                20160227Z: 40
+  /api/v1/repos/{user_id}/{repo}/stats/installs/{distro}/series/{interval}.json:
+    get:
+      operationId: stats_installs_series_by_distro
+      tags:
+      - stats
+      summary: installs_series (by distro)
+      description: |-
+        Retrieve a time series of all the repository installs that match a
+        particular criteria for a give time period. This is specific to a single repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/series/weekly.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: interval
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      responses:
+        '200':
+          description: '[RepositoryInstalls](#object_RepositoryInstalls) JSON object containing the details
+            of repository installs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeriesValue'
+              example:
+                20160221Z: 22
+                20160222Z: 21
+                20160223Z: 29
+                20160224Z: 19
+                20160225Z: 30
+                20160226Z: 38
+                20160227Z: 40
+  /api/v1/repos/{user_id}/{repo}/stats/installs/{distro}/{version}/series/{interval}.json:
+    get:
+      operationId: stats_installs_series_by_distro_and_version
+      tags:
+      - stats
+      summary: installs_series (by distro and version)
+      description: |-
+        Retrieve a time series of all the repository installs that match a
+        particular criteria for a give time period. This is specific to a single repository.
+
+        Default date range is 7 days ago. See response headers for [pagination](#pagination) information.
+
+        Everyone for public repositories, Owners & Collaborators for private repositories.
+
+        **Example request:**
+
+        ```
+        /api/v1/repos/julio/test_repo/stats/installs/series/weekly.json
+        ```
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The user this repo belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of this repository.
+      - name: distro
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the distribution to filter repository installs by (i.e. ubuntu)
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      - name: interval
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The version name of the distribution to filter repository installs by (i.e. precise)
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 ending date, like 20160231Z.
+      - name: master_token
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The master\_token name or id to filter repository installs by.
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ISO8601 starting date, like 20160231Z.
+      - name: user_agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The user\_agent to filter repository installs by.
+      responses:
+        '200':
+          description: '[RepositoryInstalls](#object_RepositoryInstalls) JSON object containing the details
+            of repository installs.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeriesValue'
+              example:
+                20160221Z: 22
+                20160222Z: 21
+                20160223Z: 29
+                20160224Z: 19
+                20160225Z: 30
+                20160226Z: 38
+                20160227Z: 40
+  /api/v1/token.json:
+    get:
+      operationId: api_tokens_get_token
+      tags:
+      - api_tokens
+      summary: get_token
+      description: |-
+        Retrieve your API token programmatically. Authenticate with your packagecloud account email address (as the basic-auth username) and password (as the basic-auth password); be sure to URL-encode the username and password if you embed them in the URL.
+
+        **Example request:**
+
+        ```
+        curl "https://hi%40hi.com:Asdd45VvaarT4591@packagecloud.io/api/v1/token.json"
+        ```
+      security:
+      - emailPassword: []
+      responses:
+        '200':
+          description: APIToken A JSON hash mapping the key `token` to your API token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIToken'
+              example:
+                token: f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0
+components:
+  securitySchemes:
+    apiToken:
+      type: http
+      scheme: basic
+      description: 'HTTP basic auth: provide your API token as the username, leave the password empty.'
+    emailPassword:
+      type: http
+      scheme: basic
+      description: HTTP basic auth using your packagecloud account email as the username and password
+        as the password. Used by the token-retrieval endpoint.
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+      description: One-based page index.
+    perPageParam:
+      name: per_page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+      description: Items per page (default 30). Values above the server's Max-Per-Page are clamped; inspect
+        the Max-Per-Page response header for the effective cap.
+  headers:
+    LinkHeader:
+      description: RFC-5988 pagination links for this response (rel="next", "prev", "last").
+      schema:
+        type: string
+    TotalHeader:
+      description: Total number of items in the underlying collection.
+      schema:
+        type: integer
+    PerPageHeader:
+      description: Number of items returned on this page.
+      schema:
+        type: integer
+    MaxPerPageHeader:
+      description: Maximum number of items the server will return on a single page.
+      schema:
+        type: integer
+  schemas:
+    CountValue:
+      type: object
+      properties:
+        value:
+          type: integer
+          description: The value of the result
+      example:
+        value: 12312
+    GPGKey:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the GPG key.
+        fingerprint:
+          type: string
+          description: The GPG key's fingerprint.
+        keytype:
+          type: string
+          description: The GPG key type ('repo' for repository signing keys or 'package' for package signing
+            keys).
+        self:
+          type: string
+          description: The URL for this object.
+        destroy_url:
+          type: string
+          description: The URL that can be used to delete this GPG key.
+        download_url:
+          type: string
+          description: The URL that can be used to download the GPG public key data.
+      example:
+        name: user-repo-99A35B3F55E8EB3B.pub.gpg
+        fingerprint: 99A35B3F55E8EB3B
+        keytype: repo
+        self: /api/v1/repos/user/repo/gpg_keys/user-repo-99A35B3F55E8EB3B.pub.gpg.json
+        destroy_url: /api/v1/repos/user/repo/gpg_keys/user-repo-99A35B3F55E8EB3B.pub.gpg.json
+        download_url: https://packagecloud.io/user/repo/gpgkey
+    MasterToken:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the master token.
+        value:
+          type: string
+          description: The value of the master token, for use in the read token API.
+        read_tokens:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              name:
+                type: string
+          description: An array of {ReadToken} objects that belong to this master token.
+        paths:
+          type: object
+          properties:
+            self:
+              type: string
+              description: A URI for this master token. Can be used to destroy one.
+      example:
+        value: e5480f5b38f1f78de2aaa0fa732d1427b1b83113371fd97d
+        name: default
+        read_tokens:
+        - value: 3fe453060fd7f017219e308eb98ccf273b4c3655ba57577a
+          name: app1.somewhere.com
+        paths:
+          self: /api/v1/repos/somewhere/production/master_tokens/1
+    MasterTokenReadTokens:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the master token.
+        value:
+          type: string
+          description: The value of the master token, for use in the read token API.
+        read_tokens_url:
+          type: string
+          description: a URI to get all of the read tokens for this master token.
+        paths:
+          type: object
+          properties:
+            self:
+              type: string
+              description: A URI for this master tokens read tokens.
+      example:
+        name: default
+        value: e5480f5b38f1f78de2aaa0fa732d1427b1b83113371fd97d
+        paths:
+          self: /api/v1/repos/somewhere/production/master_tokens/1
+        read_tokens_url: /api/v1/repos/somewhere/production/master_tokens/1/read_tokens
+    MasterTokensResult:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the master token.
+        value:
+          type: string
+          description: The value of the master token, for use in the read token API.
+        self_url:
+          type: string
+          description: A URI for this master token. Can be used to destroy one.
+        read_tokens_url:
+          type: string
+          description: a URI to get all of the read tokens for this master token.
+      example:
+        name: default
+        value: e5480f5b38f1f78de2aaa0fa732d1427b1b83113371fd97d
+        self_url: /api/v1/repos/somewhere/production/master_tokens/1
+        read_tokens_url: /api/v1/repos/somewhere/production/master_tokens/1
+    PackageDetails:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the package.
+        distro_version:
+          type: string
+          description: The distro\_version for the package.
+        architecture:
+          type: string
+          description: The architecture of the package.
+          nullable: true
+        repository:
+          type: string
+          description: The name of the repository for the package.
+        size:
+          type: string
+          description: The size (in bytes) of the package. Returned as a String for JavaScript support.
+        summary:
+          type: string
+          description: The summary of the package (if available).
+          nullable: true
+        filename:
+          type: string
+          description: The filename of the package.
+        description:
+          type: string
+          description: The description of the package (if available).
+          nullable: true
+        md5sum:
+          type: string
+          description: The MD5 checksum for the package (if available).
+          nullable: true
+        sha1sum:
+          type: string
+          description: The SHA1 checksum for the package (if available).
+          nullable: true
+        sha256sum:
+          type: string
+          description: The SHA256 checksum for the package (if available).
+          nullable: true
+        sha512sum:
+          type: string
+          description: The SHA512 checksum for the package (if available).
+          nullable: true
+        private:
+          type: boolean
+          description: Whether or not the package is in a private repository.
+        uploader_name:
+          type: string
+          description: The name of the uploader for the package.
+        created_at:
+          type: string
+          description: When the package was uploaded.
+        licenses:
+          type: array
+          items:
+            type: string
+          description: Array of licenses for this package (if available).
+        version:
+          type: string
+          description: The version of the package.
+        release:
+          type: string
+          description: The release of the package (if available).
+          nullable: true
+        epoch:
+          type: integer
+          description: The epoch of the package (if available).
+          nullable: true
+        indexed:
+          type: boolean
+          description: Whether or not this package has been indexed.
+        scope:
+          type: string
+          nullable: true
+          description: The scope of the package (if available).
+        repository_html_url:
+          type: string
+          description: The HTML url of the repository.
+        versions_url:
+          type: string
+          description: The API url of other versions of this package.
+        promote_url:
+          type: string
+          description: The API url that can be used to promote this package.
+        total_downloads_count:
+          type: integer
+          description: The number of times this package has been downloaded.
+        download_url:
+          type: string
+          description: The url to download this package.
+        package_html_url:
+          type: string
+          description: The HTML url for this package.
+        downloads_detail_url:
+          type: string
+          description: The url to get access log details for package downloads.
+        downloads_series_url:
+          type: string
+          description: The url to get time series data for package downloads.
+        downloads_count_url:
+          type: string
+          description: The url to get the total number of package downloads.
+        destroy_url:
+          type: string
+          description: The url for the HTTP DELETE request to destroy this package.
+        self_url:
+          type: string
+          description: The API url for this response.
+        dependencies:
+          type: array
+          items:
+            type: object
+            properties:
+              context:
+                type: string
+              dependencies:
+                type: array
+                items:
+                  type: string
+          nullable: true
+        repository_url:
+          type: string
+        package_url:
+          type: string
+      example:
+        name: jake
+        distro_version: fedora/22
+        architecture: x86_64
+        repository: test_repo
+        size: '3712'
+        summary: jake douglas is a very nice young man.
+        filename: jake-1.0-1.el6.x86_64.rpm
+        description: as it so happens, jake douglas is a very nice young man.
+        dependencies:
+        - context: requires
+          dependencies:
+          - libc.so.6(GLIBC_2.2.5)(64bit)
+          - rtld(GNU_HASH)
+        md5sum: 5abe922fc4bbf5bbdac9b85173371892
+        sha1sum: 062fd41ecf96587309ec9a3ae2035cc44c348b8f
+        sha256sum: 070da5370a96ba3ae679e7d02d7de6309e4d159340d9f3b555d6d5b4b7cf260a
+        sha512sum: 406fa288d5dfff194ec2b119b798c4658375a5d07b34f2d6350885cdf6b620f3fdeee45427fef8bcd37e6624049fba0c633b5b4030b79bf96028db6b4f01de87
+        private: false
+        uploader_name: test_user
+        created_at: '2017-03-13T02:49:29.000Z'
+        licenses:
+        - GPL
+        version: '1.0'
+        release: 1.el6
+        epoch: 0
+        indexed: false
+        scope: null
+        repository_url: /api/v1/repos/test_user/test_repo
+        repository_html_url: /test_user/test_repo
+        package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+        versions_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/versions.json
+        promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+        total_downloads_count: 0
+        download_url: https://packagecloud.io/test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm/download
+        package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+        downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+        downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+        downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+        destroy_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+        self_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+      required:
+      - name
+      - distro_version
+      - architecture
+      - repository
+      - size
+      - summary
+      - filename
+      - description
+      - md5sum
+      - sha1sum
+      - sha256sum
+      - sha512sum
+      - private
+      - uploader_name
+      - created_at
+      - licenses
+      - version
+      - release
+      - epoch
+      - indexed
+      - scope
+      - repository_html_url
+      - versions_url
+      - promote_url
+      - total_downloads_count
+      - download_url
+      - package_html_url
+      - downloads_detail_url
+      - downloads_series_url
+      - downloads_count_url
+      - destroy_url
+      - self_url
+      - dependencies
+      - repository_url
+      - package_url
+    PackageDownloads:
+      type: object
+      properties:
+        downloaded_at:
+          type: string
+          description: The date this package was downloaded (UTC)
+        ip_address:
+          type: string
+          description: The ip address of this package download
+        user_agent:
+          type: string
+          description: The user agent of the client which downloaded the package
+        source:
+          type: string
+          description: The source of the package download ("web" or "cli")
+        read_token:
+          type: string
+          description: The name of the read token (for private repositories)
+    PackageFragment:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the package.
+        created_at:
+          type: string
+          description: When the package was uploaded.
+        distro_version:
+          type: string
+          description: The distro\_version for the package.
+        version:
+          type: string
+          description: The version of the package.
+        release:
+          type: string
+          description: The release of the package (if available).
+          nullable: true
+        architecture:
+          type: string
+          description: The architecture of the package (if available).
+          nullable: true
+        epoch:
+          type: integer
+          description: The epoch of the package (if available).
+          nullable: true
+        scope:
+          type: string
+          nullable: true
+          description: The scope of the package (if available).
+        private:
+          type: boolean
+          description: Whether or not the package is in a private repository.
+        type:
+          type: string
+          description: The type of package ("deb", "gem", or "rpm").
+        filename:
+          type: string
+          description: The filename of the package.
+        uploader_name:
+          type: string
+          description: The name of the uploader for the package.
+        indexed:
+          type: boolean
+          description: Whether or not this package has been indexed.
+        repository_html_url:
+          type: string
+          description: The HTML url of the repository.
+        package_url:
+          type: string
+          description: The API url for this package.
+        package_html_url:
+          type: string
+          description: The HTML url for this package.
+        downloads_detail_url:
+          type: string
+          description: The url to get access log details for package downloads.
+        downloads_series_url:
+          type: string
+          description: The url to get time series data for package downloads.
+        downloads_count_url:
+          type: string
+          description: The url to get the total number of package downloads.
+        promote_url:
+          type: string
+          description: The url for promoting this to another repository.
+        destroy_url:
+          type: string
+          description: The url for the HTTP DELETE request to destroy this package.
+        download_url:
+          type: string
+          description: The direct download URL for this package (includes a read token).
+        sha256sum:
+          type: string
+          description: The SHA-256 checksum of the package file.
+          nullable: true
+      example:
+        name: jake
+        distro_version: fedora/22
+        created_at: '2017-03-13T02:49:29.000Z'
+        version: '1.0'
+        release: 1.el6
+        epoch: 0
+        scope: null
+        private: false
+        type: rpm
+        filename: jake-1.0-1.el6.x86_64.rpm
+        uploader_name: test_user
+        indexed: false
+        repository_html_url: /test_user/test_repo
+        package_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6.json
+        downloads_detail_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/detail.json
+        downloads_series_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/series/daily.json
+        downloads_count_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/1.0/1.el6/stats/downloads/count.json
+        package_html_url: /test_user/test_repo/packages/fedora/22/jake-1.0-1.el6.x86_64.rpm
+        promote_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm/promote.json
+        delete_url: /api/v1/repos/test_user/test_repo/fedora/22/jake-1.0-1.el6.x86_64.rpm
+      required:
+      - name
+      - created_at
+      - distro_version
+      - version
+      - release
+      - architecture
+      - epoch
+      - scope
+      - private
+      - type
+      - filename
+      - uploader_name
+      - indexed
+      - repository_html_url
+      - package_url
+      - package_html_url
+      - downloads_detail_url
+      - downloads_series_url
+      - downloads_count_url
+      - promote_url
+      - destroy_url
+      - download_url
+      - sha256sum
+    PackageVersion:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the package.
+        versions_count:
+          type: integer
+          description: How many versions this package has.
+        versions_url:
+          type: string
+          description: The API url of all versions of this package.
+        repository_url:
+          type: string
+          description: The API url of the repository.
+        repository_html_url:
+          type: string
+          description: The HTML url of the repository.
+      example:
+        name: jake
+        versions_count: 1
+        versions_url: /api/v1/repos/test_user/test_repo/package/rpm/fedora/22/jake/x86_64/versions.json
+        repository_url: /api/v1/repos/test_user/test_repo
+        repository_html_url: /test_user/test_repo
+    ReadToken:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the token. Probably the FQDN of the node that owns it.
+        value:
+          type: string
+          description: The value of the token. This is the value to use in the actual connection string
+            to the repo.
+        id:
+          type: integer
+      example:
+        id: 231
+        value: 3fe453060fd7f017219e308eb98ccf273b4c3655ba57577a
+        name: app1.someservice.com
+    Repository:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the repo.
+        created_at:
+          type: string
+          description: A timestamp of when the repo was created.
+        url:
+          type: string
+          description: The packagecloud URL for the repo.
+        last_push_human:
+          type: string
+          description: A human readable string describing the number of packages in the repo.
+        private:
+          type: boolean
+          description: A boolean value indicating whether or not the repo is private.
+        total_installs_count:
+          type: integer
+          description: The number of times this repository has been installed.
+        fqname:
+          type: string
+          description: A string value of the fully qualified name (owner/reponame) for this repo. i.e.
+            computology/public
+        package_count_human:
+          type: string
+      example:
+        name: myrepo
+        created_at: '2014-02-26T00:03:28.000Z'
+        url: https://packagecloud.io/cooluser/myrepo
+        last_push_human: 3 days ago
+        package_count_human: 17 packages
+        private: false
+        total_installs_count: 1231
+        fqname: cooluser/myrepo
+      required:
+      - name
+      - created_at
+      - url
+      - last_push_human
+      - private
+      - fqname
+      - package_count_human
+    RepositoryInstalls:
+      type: object
+      properties:
+        installed_at:
+          type: string
+          description: The date this repository was installed (UTC)
+        ip_address:
+          type: string
+          description: The ip address of this repository install
+        user_agent:
+          type: string
+          description: The user agent of the client which installed this repository
+        master_token:
+          type: string
+          description: The master token associated with this repository install
+        distro_version:
+          type: string
+          description: The distribution version this repository was installed for
+    SeriesValue:
+      type: object
+      properties:
+        value:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Map from ISO8601 date-hour strings to the count for that window.
+      required:
+      - value
+    APIToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Your packagecloud API token, used for HTTP basic authentication on subsequent requests.
+      example:
+        token: f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0
+    License:
+      type: object
+      properties:
+        license:
+          type: string
+          description: The packagecloud:enterprise license data (YAML-encoded string).
+        signature:
+          type: string
+          description: The GPG signature of the license data, verifiable against the packagecloud GPG
+            key.
+      example:
+        license: |
+          ---
+          :company_name: company-2
+          :company_domain: www.domain2.com
+        signature: |
+          -----BEGIN PGP SIGNATURE-----
+          ...
+          -----END PGP SIGNATURE-----
+    DistroVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The numeric id of this version. Used as the `distro_version_id` value on package-upload
+            requests.
+        display_name:
+          type: string
+          description: Human-readable name for the version (e.g. "5.10 Breezy Badger").
+        index_name:
+          type: string
+          description: Short canonical name used in repository paths (e.g. "breezy").
+          nullable: true
+        version_number:
+          type: string
+          description: The version number portion when applicable (e.g. "5.10").
+          nullable: true
+      example:
+        id: 4
+        display_name: 5.10 Breezy Badger
+        index_name: breezy
+        version_number: '5.10'
+      required:
+      - id
+      - display_name
+      - index_name
+      - version_number
+    Distribution:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Human-readable name for the distribution (e.g. "Ubuntu").
+        index_name:
+          type: string
+          description: Short canonical name used in repository paths (e.g. "ubuntu").
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistroVersion'
+          description: The known versions of this distribution.
+      example:
+        display_name: Ubuntu
+        index_name: ubuntu
+        versions:
+        - id: 4
+          display_name: 5.10 Breezy Badger
+          index_name: breezy
+          version_number: '5.10'
+    PackageContents:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                type: string
+              size:
+                type: integer
+              md5sum:
+                type: string
+          description: An array of file entries referenced by the source package; each entry has a `filename`,
+            `size`, and `md5sum`.
+      example:
+        files:
+        - filename: jake_1.0.orig.tar.bz2
+          size: 1108
+          md5sum: a7a309b55424198ee98abcb8092d7be0
+        - filename: jake_1.0-7.debian.tar.gz
+          size: 1571
+          md5sum: 0fa5395e95ddf846b419e96575ce8044
+

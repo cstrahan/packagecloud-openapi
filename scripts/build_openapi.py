@@ -975,11 +975,13 @@ def build_openapi(parsed, overrides: dict | None = None) -> dict:
                     " ".join(op["response_text"].split())
                 )
                 responses = {
-                    status: {
-                        "description": resp_desc or "Successful response",
-                        "content": {"application/json": content_schema},
-                    },
+                    status: {"description": resp_desc or "Successful response"},
                 }
+                # A 204 (No Content) response must not carry a body. Emitting a
+                # JSON schema there makes generated SDKs try to decode an empty
+                # body and fail on otherwise-successful DELETEs.
+                if status != "204":
+                    responses[status]["content"] = {"application/json": content_schema}
 
                 full_desc = "\n\n".join(filter(None, [op["description"], op["notes"]])).strip()
                 if op["example_requests"]:

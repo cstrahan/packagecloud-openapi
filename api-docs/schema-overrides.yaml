@@ -136,6 +136,20 @@ schemas:
         - value
 
 operations:
+  # Docs declare the response as ``Hash<String, Distribution>`` — one
+  # Distribution per package-type key — but both the docs' own prose ("values
+  # will be an array of hashes describing each distribution") and the live
+  # response make each value an *array* of Distributions (e.g. ``deb`` maps to
+  # Ubuntu, Debian, …). The ``Hash<String, X>`` grammar can't express a nested
+  # array, so spell the corrected shape out inline.
+  distributions_index:
+    response_schema:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/Distribution'
+
   # Docs declare the response as "Hash" (unhelpful); the real shape is the
   # synthesized License type.
   licenses_index:

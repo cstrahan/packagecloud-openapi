@@ -41,7 +41,9 @@ paths:
               schema:
                 type: object
                 additionalProperties:
-                  $ref: '#/components/schemas/Distribution'
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Distribution'
               example:
                 deb:
                 - display_name: Ubuntu
@@ -196,10 +198,6 @@ paths:
       responses:
         '204':
           description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
     get:
       operationId: gpg_keys_show
       tags:
@@ -516,10 +514,6 @@ paths:
       responses:
         '204':
           description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
   /api/v1/repos/{user_id}/{repo}/packages/contents.json:
     post:
       operationId: packages_contents
@@ -2484,10 +2478,6 @@ paths:
       responses:
         '204':
           description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
     get:
       operationId: read_tokens_show
       tags:

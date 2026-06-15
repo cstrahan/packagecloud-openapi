@@ -82,8 +82,18 @@ schemas:
     remove_properties:
       - delete_url
 
-    # No `optional` list — across all audited repos every declared field was
-    # present in every response.
+    # Helm and Alpine packages omit several fields entirely (absent, not null):
+    #   helm   — omits release, architecture, epoch, scope.
+    #   alpine — omits release, epoch, scope, sha256sum.
+    # (Alpine also returns "" for package_url and the downloads_*/promote/destroy
+    # URLs — valid strings, so no schema change, but those detail/stat/promote
+    # views simply don't exist for apk packages.)
+    optional:
+      - architecture
+      - epoch
+      - release
+      - scope
+      - sha256sum
 
   DistroVersion:
     # The /api/v1/distributions payload (see dists.json) returns some
@@ -109,6 +119,7 @@ schemas:
     #   dependencies          — gem/whl/jar + occasional rpm.
     #   md5sum/sha1sum/
     #   sha256sum/sha512sum   — jar (Maven artifacts expose no checksum?).
+    #   scope                 — null on helm (and other non-npm types).
     nullable:
       - summary
       - release
@@ -120,6 +131,7 @@ schemas:
       - sha1sum
       - sha256sum
       - sha512sum
+      - scope
 
   SeriesValue:
     # The docs' example shows a bare date-keyed map (``{"20160221Z": 22, …}``)

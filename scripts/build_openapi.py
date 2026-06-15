@@ -907,6 +907,61 @@ def _apply_schema_overrides(schemas: dict, overrides: dict) -> None:
             schema["required"] = required
 
 
+INFO_DESCRIPTION = """\
+REST API for managing packagecloud repositories. Generated from \
+https://packagecloud.io/docs/api.
+
+## Consuming packages
+
+Once a read token is provisioned (via the `/install` endpoints or the \
+read-tokens API), packages are served from per-repository URLs. This spec does \
+not model those as operations — their sub-paths follow each package manager's \
+own layout (e.g. a Maven repo's groupId/artifactId/version tree), not \
+packagecloud's. Substitute `<user>`, `<repo>`, `<token>`, and the consuming \
+system's `<os>`/`<dist>` (the `/install` endpoints describe how those are \
+derived; file/registry names use `<user>_<repo>`, where only the `/` separator \
+becomes `_`).
+
+**apt (deb).** Modern apt (>= 1.1) keeps the token out of the list file:
+- `/etc/apt/sources.list.d/<user>_<repo>.list`:
+  `deb [signed-by=/etc/apt/keyrings/<user>_<repo>-archive-keyring.gpg] \
+https://packagecloud.io/<user>/<repo>/<os>/ <dist> main` (plus a matching \
+`deb-src` line)
+- `/etc/apt/auth.conf.d/<user>_<repo>.conf`:
+  `machine packagecloud.io/<user>/<repo>/ login <token> password <ignored>`
+- GPG key: `https://packagecloud.io/<user>/<repo>/gpgkey`
+
+  Legacy apt (< 1.1) instead embeds the token in the URL and drops `signed-by`:
+  `deb https://<token>:@packagecloud.io/<user>/<repo>/<os>/ <dist> main`.
+
+**yum/dnf & zypper (rpm).** In the `.repo` file:
+`baseurl=https://<token>:@packagecloud.io/<user>/<repo>/<os>/<dist>/$basearch` \
+(source RPMs at `.../<os>/<dist>/SRPMS`), \
+`gpgkey=https://<token>:@packagecloud.io/<user>/<repo>/gpgkey`.
+
+**apk (alpine).** Append to `/etc/apk/repositories`: \
+`https://<token>:@packagecloud.io/<user>/<repo>/alpine/<dist>/main`; RSA signing \
+key for `/etc/apk/keys`: `https://<token>:@packagecloud.io/<user>/<repo>/rsakey`.
+
+**npm.** Registry `https://packagecloud.io/<user>/<repo>/npm/`, with \
+`//packagecloud.io/<user>/<repo>/npm/:_authToken=<token>` in `.npmrc`.
+
+**pip (pypi).** \
+`extra-index-url=https://<token>:@packagecloud.io/<user>/<repo>/pypi/simple` \
+(use `index-url` to make it the only source).
+
+**RubyGems.** `https://<token>:@packagecloud.io/<user>/<repo>/` (e.g. via \
+`gem source --add` or a Bundler `source`).
+
+**Maven / Gradle / Leiningen / SBT.** The token is path-embedded, since these \
+tools handle userinfo-in-URL poorly: \
+`https://packagecloud.io/priv/<token>/<user>/<repo>/maven2`.
+
+**Helm.** `helm repo add <user>_<repo> \
+https://packagecloud.io/<user>/<repo>/helm --username <token> --password <any>`.
+"""
+
+
 def _synthesize_install_endpoints(paths: dict, tags_seen: list[str]) -> None:
     """Add the ``/install/...`` repository-setup endpoints.
 
@@ -939,9 +994,18 @@ def _synthesize_install_endpoints(paths: dict, tags_seen: list[str]) -> None:
     def os_dist_name_params():
         return [
             {"name": "os", "in": "query", "required": True, "schema": {"type": "string"},
-             "description": "Target distribution, e.g. `ubuntu`, `el`, `opensuse`."},
+             "description": (
+                 "The consuming system's OS, as the setup scripts detect it — e.g. "
+                 "`ubuntu`, `debian`, `el` (the scripts also pass `almalinux`, "
+                 "`centos`, etc.), `alpine`, `opensuse`. packagecloud maps it to a "
+                 "supported distribution and is lenient about case and family "
+                 "aliases.")},
             {"name": "dist", "in": "query", "required": True, "schema": {"type": "string"},
-             "description": "Distribution version, e.g. `precise`, `8`, `13.2`."},
+             "description": (
+                 "The OS version as detected — a Debian/Ubuntu codename (`jammy`), an "
+                 "Enterprise-Linux major (`9`), or, for Alpine, `v<major>.<minor>` "
+                 "(e.g. `v3.18` — note the leading `v`). See the supported OS list "
+                 "at https://packagecloud.io/docs#os_distro_version.")},
             {"name": "name", "in": "query", "required": True, "schema": {"type": "string"},
              "description": ("A unique identifier for the consuming system; a read "
                              "token created/reused under this name is embedded in "
@@ -1016,6 +1080,23 @@ def _synthesize_install_endpoints(paths: dict, tags_seen: list[str]) -> None:
         }
     }
 
+    paths[f"{base}/apt_auth_conf"] = {
+        "get": {
+            "operationId": "install_apt_auth_conf",
+            "tags": [tag],
+            "summary": "apt auth.conf",
+            "description": (
+                "Return the netrc-style credentials line for "
+                "`/etc/apt/auth.conf.d/` — `machine packagecloud.io/<user>/<repo>/ "
+                "login <read-token> password <ignored>` — which lets modern apt "
+                "(>= 1.1) keep the token out of the `.list` file (paired with the "
+                "token-less, `signed-by=` form of `config_file.list`)."),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params() + os_dist_name_params(),
+            "responses": text_responses(200, "An apt auth.conf.d credentials line."),
+        }
+    }
+
     paths[f"{base}/config_file.repo"] = {
         "get": {
             "operationId": "install_config_file_repo",
@@ -1029,6 +1110,100 @@ def _synthesize_install_endpoints(paths: dict, tags_seen: list[str]) -> None:
             "security": [{"masterToken": []}],
             "parameters": user_repo_params() + os_dist_name_params(),
             "responses": text_responses(200, "A yum/zypper .repo fragment."),
+        }
+    }
+
+    paths[f"{base}/config_file.alpine"] = {
+        "get": {
+            "operationId": "install_config_file_alpine",
+            "tags": [tag],
+            "summary": "apk config",
+            "description": (
+                "Return an Alpine `apk` repository line for this repository (with "
+                "an embedded read token), to append to `/etc/apk/repositories`; the "
+                "server sends it as `Content-Type: application/x-sh`. The alpine "
+                "setup script's apk counterpart to `config_file.list`. Use "
+                "`os=alpine` and `dist=v<major>.<minor>`."),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params() + os_dist_name_params(),
+            "responses": text_responses(200, "An apk repository line."),
+        }
+    }
+
+    paths[f"{base}/rsa_key_url.alpine"] = {
+        "get": {
+            "operationId": "install_rsa_key_url_alpine",
+            "tags": [tag],
+            "summary": "alpine rsa key url",
+            "description": (
+                "Return a URL (with an embedded read token) to this repository's "
+                "Alpine **RSA** signing key, as plain text, for `/etc/apk/keys`. The "
+                "alpine counterpart to `gpg_key_url.list` (Alpine signs indexes with "
+                "RSA, not GPG). Use `os=alpine` and `dist=v<major>.<minor>`."),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params() + os_dist_name_params(),
+            "responses": text_responses(200, "A URL to the repository's RSA key."),
+        }
+    }
+
+    paths[f"{base}/script.{{type}}.sh"] = {
+        "get": {
+            "operationId": "install_script",
+            "tags": [tag],
+            "summary": "install script",
+            "description": (
+                "Return a self-contained bash setup script for the given package "
+                "manager, served as `Content-Type: application/x-sh`. Pipe it to a "
+                "shell — `sudo bash` for the OS package managers (they write to "
+                "system paths), plain `bash` for the language ones — e.g.\n\n"
+                "```\n"
+                "curl -s https://<master-token>:@packagecloud.io/install/"
+                "repositories/{user_id}/{repo}/script.deb.sh | sudo bash\n"
+                "```\n\n"
+                "By `type`:\n\n"
+                "- `deb`: detect the OS, install prerequisites (curl, gpg, "
+                "apt-transport-https, debian-archive-keyring), import the repo GPG "
+                "key (via `gpg_key_url.list`), write `/etc/apt/sources.list.d/` from "
+                "`config_file.list`, then `apt-get update`.\n"
+                "- `rpm`: write a `.repo` from `config_file.repo` into "
+                "`/etc/yum.repos.d/` (or `/etc/zypp/repos.d/` on SUSE) and refresh "
+                "the cache.\n"
+                "- `alpine`: import the repo's RSA signing key (via "
+                "`rsa_key_url.alpine`) into `/etc/apk/keys`, then append the apk "
+                "repository (from `config_file.alpine`) to `/etc/apk/repositories`.\n"
+                "- `node`: mint a read token (via `tokens.text`) and write an "
+                "`.npmrc` registry entry.\n"
+                "- `gem`: mint a read token and `gem source --add` the repo.\n"
+                "- `python`: mint a read token and add the repo to "
+                "`~/.pip/pip.conf`.\n"
+                "- `helm`: mint a read token and `helm repo add` (then "
+                "`helm repo update`) with the token as the username.\n\n"
+                "The `deb`, `rpm`, `alpine`, and `helm` scripts register the "
+                "repository locally as `<user>_<repo>` — only the `/` separator "
+                "becomes `_`; dashes and other characters in the repo name are "
+                "preserved (e.g. `acme/my-repo` → `acme_my-repo`). That name is "
+                "used for the apt "
+                "`.list` file (and its `-archive-keyring.gpg`), the yum/zypper "
+                "`.repo` file, the apk repository entry, and the `helm repo add` "
+                "name respectively. The `node`, `gem`, and `python` scripts create "
+                "no named entry — they configure the registry/source URL directly.\n\n"
+                "Inputs are read from environment variables set before running "
+                "(the script takes no arguments when piped):\n\n"
+                "- `os`, `dist`: override the auto-detected distribution and "
+                "version — honored by `deb`, `rpm`, and `alpine` (see the supported "
+                "OS list at https://packagecloud.io/docs#os_distro_version).\n"
+                "- `unique_id`: the read-token name to create/reuse — honored by "
+                "`deb`, `rpm`, `node`, `python`, and `alpine`; defaults to the "
+                "machine's hostname. (`gem` and `helm` always use the hostname.)"),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params() + [
+                {"name": "type", "in": "path", "required": True,
+                 "schema": {"type": "string"},
+                 "description": ("Package-manager type. Known values: `deb`, `rpm`, "
+                                 "`alpine`, `node`, `gem`, `python`, `helm`."),
+                 "example": "deb"},
+            ],
+            "responses": text_responses(200, "A bash setup script."),
         }
     }
 
@@ -1147,8 +1322,7 @@ def build_openapi(parsed, overrides: dict | None = None) -> dict:
         "info": {
             "title": "packagecloud API",
             "version": "1.0.0",
-            "description": ("REST API for managing packagecloud repositories. "
-                            "Generated from https://packagecloud.io/docs/api."),
+            "description": INFO_DESCRIPTION,
         },
         "servers": [{"url": "https://packagecloud.io"}],
         "security": [{"apiToken": []}],

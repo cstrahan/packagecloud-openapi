@@ -907,6 +907,132 @@ def _apply_schema_overrides(schemas: dict, overrides: dict) -> None:
             schema["required"] = required
 
 
+def _synthesize_install_endpoints(paths: dict, tags_seen: list[str]) -> None:
+    """Add the ``/install/...`` repository-setup endpoints.
+
+    These power the per-OS setup snippets on a repository's install page. They
+    are not part of the documented ``/api/v1`` surface and don't appear on the
+    API docs page, so they're synthesized from scratch here (as raw OpenAPI,
+    since they're plain-text, master-token-authenticated, and not under
+    ``/api/v1``).
+
+    Auth: the basic-auth *username* is a repository **master token value**
+    (password empty) — retrieve it from the master_tokens API; the install page
+    uses the repository's ``default`` master token. The ``name`` parameter mints
+    a read token scoped to that master token, idempotently keyed by name (the
+    same name always yields the same read token), and embeds it in the output.
+    """
+    tag = "install"
+    if tag not in tags_seen:
+        tags_seen.append(tag)
+
+    def user_repo_params():
+        return [
+            {"name": "user_id", "in": "path", "required": True,
+             "schema": {"type": "string"},
+             "description": "The username the repository belongs to."},
+            {"name": "repo", "in": "path", "required": True,
+             "schema": {"type": "string"},
+             "description": "The name of the repository."},
+        ]
+
+    def os_dist_name_params():
+        return [
+            {"name": "os", "in": "query", "required": True, "schema": {"type": "string"},
+             "description": "Target distribution, e.g. `ubuntu`, `el`, `opensuse`."},
+            {"name": "dist", "in": "query", "required": True, "schema": {"type": "string"},
+             "description": "Distribution version, e.g. `precise`, `8`, `13.2`."},
+            {"name": "name", "in": "query", "required": True, "schema": {"type": "string"},
+             "description": ("A unique identifier for the consuming system; a read "
+                             "token created/reused under this name is embedded in "
+                             "the output.")},
+        ]
+
+    def text_responses(status: int, desc: str):
+        return {str(status): {
+            "description": desc,
+            "content": {"text/plain": {"schema": {"type": "string"}}},
+        }}
+
+    base = "/install/repositories/{user_id}/{repo}"
+
+    paths[f"{base}/tokens.text"] = {
+        "post": {
+            "operationId": "install_token",
+            "tags": [tag],
+            "summary": "create read token",
+            "description": (
+                "Create — or idempotently reuse — a read token for installing "
+                "packages from this repository, returning the bare token value as "
+                "plain text. The `name` field is a unique identifier for the "
+                "consuming system; the same name always returns the same read "
+                "token. Used by the npm, gem, and pip setup snippets."),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params(),
+            "requestBody": {
+                "required": True,
+                "content": {"application/x-www-form-urlencoded": {"schema": {
+                    "type": "object",
+                    "properties": {"name": {
+                        "type": "string",
+                        "description": ("Unique identifier; the read token is "
+                                        "created/reused under this name."),
+                    }},
+                    "required": ["name"],
+                }}},
+            },
+            "responses": text_responses(201, "The read token value (plain text)."),
+        }
+    }
+
+    paths[f"{base}/gpg_key_url.list"] = {
+        "get": {
+            "operationId": "install_gpg_key_url",
+            "tags": [tag],
+            "summary": "gpg key url",
+            "description": (
+                "Return a URL (with an embedded read token) to this repository's "
+                "GPG signing key, as plain text. Used by the deb setup snippet to "
+                "import the repository key."),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params() + os_dist_name_params(),
+            "responses": text_responses(200, "A URL to the repository's GPG key."),
+        }
+    }
+
+    paths[f"{base}/config_file.list"] = {
+        "get": {
+            "operationId": "install_config_file_list",
+            "tags": [tag],
+            "summary": "apt config",
+            "description": (
+                "Return an apt `sources.list` fragment for this repository (with "
+                "an embedded read token); the server sends it as "
+                "`Content-Type: text/apt_source_list`. Used by the deb setup "
+                "snippet."),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params() + os_dist_name_params(),
+            "responses": text_responses(200, "An apt sources.list fragment."),
+        }
+    }
+
+    paths[f"{base}/config_file.repo"] = {
+        "get": {
+            "operationId": "install_config_file_repo",
+            "tags": [tag],
+            "summary": "yum/zypper config",
+            "description": (
+                "Return a yum/zypper `.repo` fragment for this repository (with an "
+                "embedded read token); the server sends it as "
+                "`Content-Type: text/repo`. Used by the rpm and zypper setup "
+                "snippets."),
+            "security": [{"masterToken": []}],
+            "parameters": user_repo_params() + os_dist_name_params(),
+            "responses": text_responses(200, "A yum/zypper .repo fragment."),
+        }
+    }
+
+
 def build_openapi(parsed, overrides: dict | None = None) -> dict:
     _synthesize_api_tokens(parsed)
     known = {o["name"] for o in parsed["objects"]}
@@ -1011,6 +1137,9 @@ def build_openapi(parsed, overrides: dict | None = None) -> dict:
     op_overrides = (overrides or {}).get("operations") or {}
     _apply_operation_overrides(paths, op_overrides, known)
     _apply_pagination(paths, op_overrides)
+    # Inject the /install setup endpoints after pagination (they aren't
+    # paginated) but before parameter sorting.
+    _synthesize_install_endpoints(paths, tags_seen)
     _sort_parameters(paths, COMPONENTS_PARAMETERS)
 
     return {
@@ -1037,6 +1166,14 @@ def build_openapi(parsed, overrides: dict | None = None) -> dict:
                     "description": ("HTTP basic auth using your packagecloud account "
                                     "email as the username and password as the password. "
                                     "Used by the token-retrieval endpoint."),
+                },
+                "masterToken": {
+                    "type": "http", "scheme": "basic",
+                    "description": ("HTTP basic auth using a repository master token "
+                                    "value as the username (password empty). Used by "
+                                    "the /install repository-setup endpoints. Retrieve "
+                                    "the value from the master_tokens API; the install "
+                                    "page uses the repository's `default` master token."),
                 },
             },
             "parameters": COMPONENTS_PARAMETERS,

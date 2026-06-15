@@ -17,6 +17,7 @@ tags:
 - name: repositories
 - name: stats
 - name: api_tokens
+- name: install
 paths:
   /api/v1/distributions:
     get:
@@ -4779,6 +4780,197 @@ paths:
                 $ref: '#/components/schemas/APIToken'
               example:
                 token: f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0
+  /install/repositories/{user_id}/{repo}/tokens.text:
+    post:
+      operationId: install_token
+      tags:
+      - install
+      summary: create read token
+      description: Create — or idempotently reuse — a read token for installing packages from this repository,
+        returning the bare token value as plain text. The `name` field is a unique identifier for the
+        consuming system; the same name always returns the same read token. Used by the npm, gem, and
+        pip setup snippets.
+      security:
+      - masterToken: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username the repository belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Unique identifier; the read token is created/reused under this name.
+              required:
+              - name
+      responses:
+        '201':
+          description: The read token value (plain text).
+          content:
+            text/plain:
+              schema:
+                type: string
+  /install/repositories/{user_id}/{repo}/gpg_key_url.list:
+    get:
+      operationId: install_gpg_key_url
+      tags:
+      - install
+      summary: gpg key url
+      description: Return a URL (with an embedded read token) to this repository's GPG signing key, as
+        plain text. Used by the deb setup snippet to import the repository key.
+      security:
+      - masterToken: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username the repository belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: dist
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Distribution version, e.g. `precise`, `8`, `13.2`.
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+        description: A unique identifier for the consuming system; a read token created/reused under this
+          name is embedded in the output.
+      - name: os
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Target distribution, e.g. `ubuntu`, `el`, `opensuse`.
+      responses:
+        '200':
+          description: A URL to the repository's GPG key.
+          content:
+            text/plain:
+              schema:
+                type: string
+  /install/repositories/{user_id}/{repo}/config_file.list:
+    get:
+      operationId: install_config_file_list
+      tags:
+      - install
+      summary: apt config
+      description: 'Return an apt `sources.list` fragment for this repository (with an embedded read token);
+        the server sends it as `Content-Type: text/apt_source_list`. Used by the deb setup snippet.'
+      security:
+      - masterToken: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username the repository belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: dist
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Distribution version, e.g. `precise`, `8`, `13.2`.
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+        description: A unique identifier for the consuming system; a read token created/reused under this
+          name is embedded in the output.
+      - name: os
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Target distribution, e.g. `ubuntu`, `el`, `opensuse`.
+      responses:
+        '200':
+          description: An apt sources.list fragment.
+          content:
+            text/plain:
+              schema:
+                type: string
+  /install/repositories/{user_id}/{repo}/config_file.repo:
+    get:
+      operationId: install_config_file_repo
+      tags:
+      - install
+      summary: yum/zypper config
+      description: 'Return a yum/zypper `.repo` fragment for this repository (with an embedded read token);
+        the server sends it as `Content-Type: text/repo`. Used by the rpm and zypper setup snippets.'
+      security:
+      - masterToken: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The username the repository belongs to.
+      - name: repo
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the repository.
+      - name: dist
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Distribution version, e.g. `precise`, `8`, `13.2`.
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+        description: A unique identifier for the consuming system; a read token created/reused under this
+          name is embedded in the output.
+      - name: os
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Target distribution, e.g. `ubuntu`, `el`, `opensuse`.
+      responses:
+        '200':
+          description: A yum/zypper .repo fragment.
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   securitySchemes:
     apiToken:
@@ -4790,6 +4982,12 @@ components:
       scheme: basic
       description: HTTP basic auth using your packagecloud account email as the username and password
         as the password. Used by the token-retrieval endpoint.
+    masterToken:
+      type: http
+      scheme: basic
+      description: HTTP basic auth using a repository master token value as the username (password empty).
+        Used by the /install repository-setup endpoints. Retrieve the value from the master_tokens API;
+        the install page uses the repository's `default` master token.
   parameters:
     pageParam:
       name: page

@@ -12,13 +12,22 @@ OpenAPI document suitable for client codegen.
 ```
 api-docs/
   packagecloud-api.html   Cached raw HTML from https://packagecloud.io/docs/api
-  packagecloud-api.md     Markdown conversion of the docs page
+  packagecloud-api.md     Markdown conversion of the API docs page
+  packagecloud-docs.html  Cached raw HTML from https://packagecloud.io/docs
+  packagecloud-docs.md    Markdown conversion of the general docs page
   schema-overrides.yaml   Empirical corrections applied on top of the generated spec
 openapi.yaml              Generated OpenAPI 3.1 spec
 scripts/
-  fetch_api_docs.py       Download the docs page → api-docs/packagecloud-api.md
+  fetch_api_docs.py       Download the API docs page → api-docs/packagecloud-api.md
+  fetch_docs.py           Download the general docs page → api-docs/packagecloud-docs.md
   build_openapi.py        Build openapi.yaml from the markdown + overrides
 ```
+
+The general docs page (`packagecloud-docs.md`) covers conceptual material —
+packaging concepts, repository setup, config files, the
+master-token/read-token/API-token model, CLI usage — and is kept as a
+human-readable reference. Unlike the API page, it does not feed the OpenAPI
+build.
 
 ## Regenerating the spec
 

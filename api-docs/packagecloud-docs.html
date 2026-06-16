@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Improved canonical -->
+    <link rel="canonical" href="https://packagecloud.io/docs">  
+
+    <meta name="description" content="General documentation for the packagecloud Command-Line Interface (CLI) and automation tools"><meta property="og:site_name" content="Packagecloud"><meta property="og:type" content="website"><meta property="og:title" content="packagecloud Documentation - Documentation for the Command-Line Interface (CLI) and automation tools"><meta property="og:description" content="General documentation for the packagecloud Command-Line Interface (CLI) and automation tools">
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","description":"General documentation for the packagecloud Command-Line Interface (CLI) and automation tools"}</script>
+
+<title>packagecloud Documentation - Documentation for the Command-Line Interface (CLI) and automation tools</title>
+
+
+    <meta name="google-site-verification" content="Zkz-4-7DH8kEHMP8bYMX6aCY-8p_f-rI_poBzSWKrFc" />
+
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="u-X8laQcOAKmkAZ_Wq7l-RBt-LUm3OeRtmLZMrxTw7uoo4pW40y5ke4eCQ2SPtUR5viK7UZzaO7JK1vPNeqZqg" />
+
+    <link rel="icon" type="image/x-icon" href="https://assets-production.packagecloud.io/assets/favicon-48a231380c384f89a0c0fbd65647a0fd9ac9c43c1da01769c7121a1882e5c182.ico" />
+
+    
+
+    <style type="text/css" media="screen">
+      /* We need this to block out the FOUC from loading the angular app at the */
+      /* bottom the document. More here https://docs.angularjs.org/api/ng/directive/ngCloak */
+      [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+        display: none !important;
+      }
+    </style>
+
+    
+<script type="text/javascript">
+  window.BugsnagConfig = {
+    api_key: 'eb1720a2bce34a9143b95dc390e8c680',
+    application_version: '01dbedbd4773215525af917ef5b15df5e3a6d9a7',
+    environment: 'production',
+  };
+</script>
+
+    <script src="https://assets-production.packagecloud.io/assets/application-edbcee0d5578e48092854b7fd92f02302d83831dbcfa8da4530cffccb9a86e1b.js" data-turbo-track="reload"></script>
+    <link rel="stylesheet" href="https://assets-production.packagecloud.io/assets/application-0f15a0c065c63725baa4f8aebb36a4d4f8f29262669d580e332f3d8fd884ae43.css" data-turbo-track="reload" defer="defer" media="all" />
+  </head>
+  <body id="" class="logged-out" ng-app="packagecloud">
+    <nav class="navigation fixed sidenav" id="new-repo-1st-nav">
+  <div class="navigation-wrapper">
+    <a class="logo" href="/" title="Home">
+      <img src="https://assets-production.packagecloud.io/assets/onboarding/logo-554612d09db371a195d042b8634a9cf2901ac43f7570f40620239af2259feb67.svg" />
+    </a>
+    <ul class="icons" style="display:">
+    <li class="more active">
+      <a href="javascript:;">
+        <img src="https://assets-production.packagecloud.io/assets/onboarding/docs-81785568ad01a0226d4e143386fe8332d9e2f65c7bec7f3f6aff8bcb5e032ea9.svg" />
+        <div class="sub-text">Docs</div>
+      </a>
+      <ul class="submenu">
+        <li class="submenu-li"><a href="/docs">General Docs</a></li>
+        <li class="submenu-li"><a href="/docs/api">API Docs</a></li>
+        <li class="submenu-li"><a target="parent" href="http://www.rubydoc.info/gems/package_cloud/">CLI Docs</a></li>
+        <li class="submenu-li"><a href="/docs/security">Security Information</a></li>
+      </ul>
+    </li>
+
+    <li>
+      <a href="/l/cli">
+        <img src="https://assets-production.packagecloud.io/assets/onboarding/cli-64d4137d32e8663ea7a5ea0bd16d28cacbd2adadb4aba3765f7cf94a1f8ef5f1.svg" />
+        <div class="sub-text">
+          CLI
+        </div>
+</a>    </li>
+    </ul>
+  </div>
+
+</nav>
+
+    <div id="contextual-sidebar" class="sidebar-container docs sidebar-positioning" contextual-sidebar>
+  <div class="sidebar-button-container">
+    <button class="btn primary"
+            ng-click="toggleMenu(model.opened)">
+      <span class="glyphicon"
+            ng-class="{'glyphicon-remove-circle': model.opened, 'glyphicon-list': !model.opened}"></span>
+    </button>
+  </div>
+  <header>
+    <h3>Table of Contents:</h3>
+  </header>
+  <ul id="docs-toc">
+  <li><a href="#packages">Packages</a></li>
+  <ul>
+    <li><a href="#what_is_package">What is a package?</a></li>
+    <li><a href="#why_packages_useful">Why are packages useful?</a></li>
+    <li><a href="#how_to_create_packages">How do I create packages?</a></li>
+    <li><a href="#which_types_of_packages">Which package types are supported?</a></li>
+  </ul>
+  <li><a href="#repos">Repos</a></li>
+  <ul>
+    <li><a href="#what_is_a_repo">What is a repo?</a></li>
+    <li><a href="#what_is_a_pkgcloud_repo">What is a packagecloud repo?</a></li>
+    <li><a href="#why_are_repos_useful">Why are repos useful?</a></li>
+    <li><a href="#how_to_create_repos">How do I create repos?</a></li>
+    <li><a href="#disable_filelists">Disabling filelist metadata</a></li>
+    <li><a href="#debian_component_support">Debian component support</a></li>
+  </ul>
+  <li><a href="#security_features">Security Features</a></li>
+  <ul>
+    <li><a href="#gpg">GPG keys</a></li>
+    <li><a href="#gpg_signing">GPG signing</a></li>
+    <li><a href="#gpg_migration">GPG key migration</a></li>
+    <li><a href="#https">HTTPS</a></li>
+    <li><a href="#public_private_repos">Public / Private Repos</a></li>
+    <li><a href="#collaborators">Repo Collaborators</a></li>
+  </ul>
+  <li><a href="#alpine">Alpine</a></li>
+  <ul>
+    <li><a href="#alpine_any">Pushing and installing alpine_any</a></li>
+  </ul>
+  <li><a href="#rpm">RPM</a></li>
+  <ul>
+    <li><a href="#rpm_any">Pushing and installing rpm_any</a></li>
+  </ul>
+  <li><a href="#deb">Deb</a></li>
+  <ul>
+    <li><a href="#deb_any">Pushing and installing deb any/any</a></li>
+  </ul>
+  <li><a href="#rubygems">RubyGems</a></li>
+  <ul>
+    <li><a href="#bundler">Bundler</a></li>
+  </ul>
+  <li><a href="#python">Python</a></li>
+  <ul>
+    <li><a href="#venv">VirtualEnv</a></li>
+  </ul>
+  <li><a href="#node">Node.JS</a></li>
+  <ul>
+    <li><a href="#node_npm">Configure the npm registry</a></li>
+    <li><a href="#npm_read_only">Read only npm registry access</a></li>
+    <li><a href="#npm_read_and_write">Read and write npm registry access</a></li>
+    <li><a href="#npm_login">Using npm login</a></li>
+    <li><a href="#npm_publish">Publish npm packages</a></li>
+    <li><a href="#node_scoped">Scoped packages</a></li>
+    <li><a href="#node_unpublish">Remove npm packages</a></li>
+    <li><a href="#npm_proxy">Auto proxy to official npm registry</a></li>
+    <li><a href="#node_yarn">Using Yarn</a></li>
+    <li><a href="#dist_tags">npm distribution tags (dist tags)</a></li>
+    <li><a href="#node_publish">npm dist tags and package upload</a></li>
+    <li><a href="#node_promote">npm dist tags and package promotion</a></li>
+    <li><a href="#node_delete">npm dist tags and package deletion</a></li>
+  </ul>
+  <li><a href="#helm">Helm</a></li>
+  <ul>
+    <li><a href="#helm">Configure Helm repository</a></li>
+  </ul>
+  <li><a href="#token_auth">Token Auth</a></li>
+  <ul>
+    <li><a href="#token_capabilities">Token Capabilities</a></li>
+    <li><a href="#master_tokens">Master tokens</a></li>
+    <li><a href="#read_tokens">Read tokens</a></li>
+    <li><a href="#revocation">Revocation</a></li>
+    <li><a href="#generate_read_token">Generate read token</a></li>
+  </ul>
+  <li><a href="#ci">Continuous Integration</a></li>
+  <ul>
+    <li><a href="#buildkite">Buildkite</a></li>
+    <li><a href="#circle_ci">CircleCI</a></li>
+    <li><a href="#github_actions">Github Actions</a></li>
+    <li><a href="#jenkins">Jenkins</a></li>
+    <li><a href="#travis">Travis CI</a></li>
+  </ul>
+  <li><a href="#build_tools">Build Tool Deploys</a></li>
+  <ul>
+    <li><a href="#maven_deploy">Maven Deploy</a></li>
+    <li><a href="#lein_deploy">Lein Deploy</a></li>
+    <li><a href="#gradle_deploy">Gradle Deploy</a></li>
+    <li><a href="#gradle_maven_publish_deploy">Gradle Maven Publish Deploy</a></li>
+    <li><a href="#sbt_deploy">SBT Deploy</a></li>
+  </ul>
+  <li><a href="#cli">Command line client</a></li>
+  <ul>
+    <li><a href="#cli_install">Installation</a></li>
+    <li><a href="#manual_pcloud_file">Creation of .packagecloud file</a></li>
+    <li><a href="#create_repo">Creating repos</a></li>
+    <li><a href="#push_pkg">Pushing packages</a></li>
+    <li><a href="#yank_pkg">Yanking packages</a></li>
+    <li><a href="#promote_pkg">Promoting packages</a></li>
+    <li><a href="#install_repo">Installing repos</a></li>
+    <li><a href="#os_distro_version">OS versions for pushing/yanking</a></li>
+  </ul>
+  <li><a href="#maven-metadata">Maven Metadata</a></li>
+  <ul>
+    <li><a href="#where-to-maven-metadata">Where to get it?</a></li>
+  </ul>
+  <li><a href="#sso">SSO</a></li>
+  <ul>
+    <li><a href="#sso_requirements">Requirements</a></li>
+    <li><a href="#okta">Okta</a></li>
+  </ul>
+  <li><a href="#pricing">Billing &amp; Pricing</a></li>
+  <ul>
+    <li><a href="/pricing/faq">FAQ</a></li>
+  </ul>
+  <li><a href="#troubleshooting">Troubleshooting</a></li>
+  <ul>
+    <li><a href="#package_not_found">Packages not found</a></li>
+    <li><a href="#unable_to_download_repo_config">Unable to download repo config</a></li>
+  </ul>
+  <li><a href="#gdpr">GDPR</a></li>
+  <ul>
+    <li><a href="#controller_processor">Is Packagecloud a data controller or data processor?</a></li>
+    <li><a href="#customer_controller">What are customers’ responsibilities as a data controller?</a></li>
+    <li><a href="#customer_dpa">Does Packagecloud have a Customer DPA?</a></li>
+  </ul>
+  <li><a class="security-nav-link" href="/docs/security">Security</a></li>
+  <ul>
+    <li><a class="security-nav-link" href="/docs/security#firewall">Firewall Info</a></li>
+    <li><a class="security-nav-link" href="/docs/security#gpg">GPG Info</a></li>
+    <li><a class="security-nav-link" href="/docs/security#pci">PCI Compliance</a></li>
+  </ul>
+</ul>
+
+</div>
+
+
+    <main class="main-content wizard-padding">
+      <div class="top-nav">
+  <ul class="logged-out-links">
+    <li><a class="btn primary" href="/users/new">Sign up</a></li>
+    <li><a class="btn primary outline" href="/session/new">Login</a></li>
+  </ul>
+</div>
+      
+      <script type="text/javascript">
+  window.generalDocApp = {};
+  window.generalDocApp.config = {
+    allDist : [{"id":162,"display_name":"0.1 jupiter","index_name":"jupiter","version_number":"0.1","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/jupiter"},{"id":163,"display_name":"0.2 luna","index_name":"luna","version_number":"0.2","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/luna"},{"id":164,"display_name":"0.3 freya","index_name":"freya","version_number":"0.3","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/freya"},{"id":193,"display_name":"0.4 loki","index_name":"loki","version_number":"0.4","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/loki"},{"id":166,"display_name":"Python","index_name":"1","version_number":"1","distro_name":"Python","package_type":"py","os_dist":"python/1"},{"id":191,"display_name":"Node.js","index_name":"1","version_number":"1","distro_name":"Node.js","package_type":"node","os_dist":"node/1"},{"id":230,"display_name":"v1","index_name":"1","version_number":"1","distro_name":"Anyfile","package_type":"anyfile","os_dist":"anyfile/1"},{"id":241,"display_name":"v1","index_name":"v1","version_number":"1","distro_name":"Helm","package_type":"helm","os_dist":"helm/v1"},{"id":274,"display_name":"Amazon Linux 1","index_name":"1","version_number":"1","distro_name":"Amazon Linux","package_type":"rpm","os_dist":"amazon/1"},{"id":21,"display_name":"4.0 etch","index_name":"etch","version_number":"4.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/etch"},{"id":1,"display_name":"4.10 Warty Warthog","index_name":"warty","version_number":"4.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/warty"},{"id":22,"display_name":"5.0 lenny","index_name":"lenny","version_number":"5.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/lenny"},{"id":2,"display_name":"5.04 Hoary Hedgehog","index_name":"hoary","version_number":"5.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/hoary"},{"id":3,"display_name":"5.10 Breezy Badger","index_name":"breezy","version_number":"5.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/breezy"},{"id":23,"display_name":"6.0 squeeze","index_name":"squeeze","version_number":"6.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/squeeze"},{"id":4,"display_name":"6.06 LTS Dapper Drake","index_name":"dapper","version_number":"6.06","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/dapper"},{"id":5,"display_name":"6.10 Edgy Eft","index_name":"edgy","version_number":"6.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/edgy"},{"id":6,"display_name":"7.04 Feisty Fawn","index_name":"feisty","version_number":"7.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/feisty"},{"id":7,"display_name":"7.10 Gutsy Gibbon","index_name":"gutsy","version_number":"7.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/gutsy"},{"id":25,"display_name":"8 jessie","index_name":"jessie","version_number":"8.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/jessie"},{"id":8,"display_name":"8.04 LTS Hardy Heron","index_name":"hardy","version_number":"8.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/hardy"},{"id":9,"display_name":"8.10 Intrepid Ibex","index_name":"intrepid","version_number":"8.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/intrepid"},{"id":149,"display_name":"9 stretch","index_name":"stretch","version_number":"9.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/stretch"},{"id":10,"display_name":"9.04 Jaunty Jackalope","index_name":"jaunty","version_number":"9.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/jaunty"},{"id":11,"display_name":"9.10 Karmic Koala","index_name":"karmic","version_number":"9.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/karmic"},{"id":150,"display_name":"10 buster","index_name":"buster","version_number":"10.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/buster"},{"id":313,"display_name":"Oracle Linux 10.0","index_name":"10","version_number":"10.0","distro_name":"Oracle Linux","package_type":"rpm","os_dist":"ol/10"},{"id":156,"display_name":"10 buster","index_name":"buster","version_number":"10.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/buster"},{"id":12,"display_name":"10.04 LTS Lucid Lynx","index_name":"lucid","version_number":"10.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/lucid"},{"id":13,"display_name":"10.10 Maverick Meerkat","index_name":"maverick","version_number":"10.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/maverick"},{"id":207,"display_name":"11 bullseye","index_name":"bullseye","version_number":"11.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/bullseye"},{"id":233,"display_name":"11 bullseye","index_name":"bullseye","version_number":"11.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/bullseye"},{"id":14,"display_name":"11.04 Natty Narwhal","index_name":"natty","version_number":"11.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/natty"},{"id":176,"display_name":"SUSE Linux Enterprise Server 11.4","index_name":"11.4","version_number":"11.4","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/11.4"},{"id":15,"display_name":"11.10 Oneiric Ocelot","index_name":"oneiric","version_number":"11.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/oneiric"},{"id":215,"display_name":"12 bookworm","index_name":"bookworm","version_number":"12.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/bookworm"},{"id":290,"display_name":"12 bookworm","index_name":"bookworm","version_number":"12.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/bookworm"},{"id":177,"display_name":"SUSE Linux Enterprise Server 12","index_name":"12.0","version_number":"12.0","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/12.0"},{"id":178,"display_name":"SUSE Linux Enterprise Server 12.1","index_name":"12.1","version_number":"12.1","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/12.1"},{"id":182,"display_name":"SUSE Linux Enterprise Server 12.2","index_name":"12.2","version_number":"12.2","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/12.2"},{"id":192,"display_name":"SUSE Linux Enterprise Server 12.3","index_name":"12.3","version_number":"12.3","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/12.3"},{"id":16,"display_name":"12.04 LTS Precise Pangolin","index_name":"precise","version_number":"12.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/precise"},{"id":212,"display_name":"SUSE Linux Enterprise Server 12.4","index_name":"12.4","version_number":"12.4","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/12.4"},{"id":213,"display_name":"SUSE Linux Enterprise Server 12.5","index_name":"12.5","version_number":"12.5","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/12.5"},{"id":17,"display_name":"12.10 Quantal Quetzal","index_name":"quantal","version_number":"12.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/quantal"},{"id":291,"display_name":"13 trixie","index_name":"trixie","version_number":"13.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/trixie"},{"id":173,"display_name":"openSUSE 13.1","index_name":"13.1","version_number":"13.1","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/13.1"},{"id":174,"display_name":"openSUSE 13.2","index_name":"13.2","version_number":"13.2","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/13.2"},{"id":18,"display_name":"13.04 Raring Ringtail","index_name":"raring","version_number":"13.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/raring"},{"id":19,"display_name":"13.10 Saucy Salamander","index_name":"saucy","version_number":"13.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/saucy"},{"id":280,"display_name":"14 forky","index_name":"forky","version_number":"14.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/forky"},{"id":28,"display_name":"14 Laughlin","index_name":"14","version_number":"14.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/14"},{"id":292,"display_name":"14 forky","index_name":"forky","version_number":"14.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/forky"},{"id":20,"display_name":"14.04 LTS Trusty Tahr","index_name":"trusty","version_number":"14.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/trusty"},{"id":142,"display_name":"14.10 Utopic Unicorn","index_name":"utopic","version_number":"14.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/utopic"},{"id":310,"display_name":"15 Duke","index_name":"duke","version_number":"15.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/duke"},{"id":29,"display_name":"15 Lovelock","index_name":"15","version_number":"15.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/15"},{"id":311,"display_name":"15 duke","index_name":"duke","version_number":"15.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/duke"},{"id":196,"display_name":"openSUSE Leap 15.0","index_name":"15.0","version_number":"15.0","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/15.0"},{"id":198,"display_name":"SUSE Linux Enterprise Server 15.0","index_name":"15.0","version_number":"15.0","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.0"},{"id":197,"display_name":"openSUSE Leap 15.1","index_name":"15.1","version_number":"15.1","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/15.1"},{"id":214,"display_name":"SUSE Linux Enterprise Server 15.1","index_name":"15.1","version_number":"15.1","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.1"},{"id":217,"display_name":"openSUSE Leap 15.2","index_name":"15.2","version_number":"15.2","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/15.2"},{"id":218,"display_name":"SUSE Linux Enterprise Server 15.2","index_name":"15.2","version_number":"15.2","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.2"},{"id":224,"display_name":"openSUSE Leap 15.3","index_name":"15.3","version_number":"15.3","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/15.3"},{"id":225,"display_name":"SUSE Linux Enterprise Server 15.3","index_name":"15.3","version_number":"15.3","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.3"},{"id":148,"display_name":"15.04 Vivid Vervet","index_name":"vivid","version_number":"15.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/vivid"},{"id":242,"display_name":"openSUSE Leap 15.4","index_name":"15.4","version_number":"15.4","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/15.4"},{"id":243,"display_name":"SUSE Linux Enterprise Server 15.4","index_name":"15.4","version_number":"15.4","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.4"},{"id":272,"display_name":"openSUSE Leap 15.5","index_name":"15.5","version_number":"15.5","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/15.5"},{"id":288,"display_name":"SUSE Linux Enterprise Server 15.5","index_name":"15.5","version_number":"15.5","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.5"},{"id":282,"display_name":"openSUSE Leap 15.6","index_name":"15.6","version_number":"15.6","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/15.6"},{"id":296,"display_name":"SUSE Linux Enterprise Server 15.6","index_name":"15.6","version_number":"15.6","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.6"},{"id":314,"display_name":"SUSE Linux Enterprise Server 15.7","index_name":"15.7","version_number":"15.7","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/15.7"},{"id":152,"display_name":"15.10 Wily Werewolf","index_name":"wily","version_number":"15.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/wily"},{"id":157,"display_name":"16 petra","index_name":"petra","version_number":"16","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/petra"},{"id":30,"display_name":"16 Verne","index_name":"16","version_number":"16.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/16"},{"id":317,"display_name":"openSUSE Leap 16.0","index_name":"16.0","version_number":"16.0","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/16.0"},{"id":319,"display_name":"SUSE Linux Enterprise Server 16.0","index_name":"16.0","version_number":"16.0","distro_name":"SUSE Linux Enterprise Server","package_type":"rpm","os_dist":"sles/16.0"},{"id":165,"display_name":"16.04 LTS Xenial Xerus","index_name":"xenial","version_number":"16.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/xenial"},{"id":168,"display_name":"16.10 Yakkety Yak","index_name":"yakkety","version_number":"16.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/yakkety"},{"id":158,"display_name":"17 qiana","index_name":"qiana","version_number":"17","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/qiana"},{"id":31,"display_name":"17 Beefy Miracle","index_name":"17","version_number":"17.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/17"},{"id":159,"display_name":"17.1 rebecca","index_name":"rebecca","version_number":"17.1","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/rebecca"},{"id":160,"display_name":"17.2 rafaela","index_name":"rafaela","version_number":"17.2","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/rafaela"},{"id":161,"display_name":"17.3 rosa","index_name":"rosa","version_number":"17.3","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/rosa"},{"id":183,"display_name":"17.04 Zesty Zapus","index_name":"zesty","version_number":"17.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/zesty"},{"id":187,"display_name":"17.10 Artful Aardvark","index_name":"artful","version_number":"17.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/artful"},{"id":170,"display_name":"18 sarah","index_name":"sarah","version_number":"18","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/sarah"},{"id":32,"display_name":"18 Spherical Cow","index_name":"18","version_number":"18.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/18"},{"id":180,"display_name":"18.1 serena","index_name":"serena","version_number":"18.1","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/serena"},{"id":185,"display_name":"18.2 sonya","index_name":"sonya","version_number":"18.2","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/sonya"},{"id":189,"display_name":"18.3 sylvia","index_name":"sylvia","version_number":"18.3","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/sylvia"},{"id":190,"display_name":"18.04 LTS Bionic Beaver","index_name":"bionic","version_number":"18.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/bionic"},{"id":199,"display_name":"18.10 Cosmic Cuttlefish","index_name":"cosmic","version_number":"18.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/cosmic"},{"id":195,"display_name":"19 tara","index_name":"tara","version_number":"19","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/tara"},{"id":33,"display_name":"19 Schrödinger's Cat","index_name":"19","version_number":"19.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/19"},{"id":202,"display_name":"19.1 tessa","index_name":"tessa","version_number":"19.1","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/tessa"},{"id":208,"display_name":"19.2 tina","index_name":"tina","version_number":"19.2","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/tina"},{"id":211,"display_name":"19.3 tricia","index_name":"tricia","version_number":"19.3","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/tricia"},{"id":167,"display_name":"Maven 2","index_name":"maven2","version_number":"2","distro_name":"Java","package_type":"jar","os_dist":"java/maven2"},{"id":275,"display_name":"Amazon Linux 2","index_name":"2","version_number":"2","distro_name":"Amazon Linux","package_type":"rpm","os_dist":"amazon/2"},{"id":171,"display_name":"2.0 Jethro","index_name":"jethro","version_number":"2.0","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/jethro"},{"id":172,"display_name":"2.1 Krogoth","index_name":"krogoth","version_number":"2.1","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/krogoth"},{"id":245,"display_name":"2.2 Morty","index_name":"morty","version_number":"2.2","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/morty"},{"id":246,"display_name":"2.3 Pyro","index_name":"pyro","version_number":"2.3","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/pyro"},{"id":247,"display_name":"2.4 Rocko","index_name":"rocko","version_number":"2.4","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/rocko"},{"id":248,"display_name":"2.5 Sumo","index_name":"sumo","version_number":"2.5","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/sumo"},{"id":249,"display_name":"2.6 Thud","index_name":"thud","version_number":"2.6","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/thud"},{"id":250,"display_name":"2.7 Warrior","index_name":"warrior","version_number":"2.7","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/warrior"},{"id":203,"display_name":"19.04 Disco Dingo","index_name":"disco","version_number":"19.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/disco"},{"id":206,"display_name":"19.10 Eoan Ermine","index_name":"eoan","version_number":"19.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/eoan"},{"id":222,"display_name":"20 ulyana","index_name":"ulyana","version_number":"20","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/ulyana"},{"id":34,"display_name":"20 Heisenbug","index_name":"20","version_number":"20.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/20"},{"id":223,"display_name":"20.1 ulyssa","index_name":"ulyssa","version_number":"20.1","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/ulyssa"},{"id":232,"display_name":"20.2 uma","index_name":"uma","version_number":"20.2","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/uma"},{"id":238,"display_name":"20.3 una","index_name":"una","version_number":"20.3","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/una"},{"id":210,"display_name":"20.04 Focal Fossa","index_name":"focal","version_number":"20.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/focal"},{"id":219,"display_name":"20.10 Groovy Gorilla","index_name":"groovy","version_number":"20.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/groovy"},{"id":276,"display_name":"Amazon Linux 2023","index_name":"2023","version_number":"2023","distro_name":"Amazon Linux","package_type":"rpm","os_dist":"amazon/2023"},{"id":259,"display_name":"21 vanessa","index_name":"vanessa","version_number":"21","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/vanessa"},{"id":143,"display_name":"21 Fedora 21","index_name":"21","version_number":"21.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/21"},{"id":267,"display_name":"21.1 vera","index_name":"vera","version_number":"21.1","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/vera"},{"id":281,"display_name":"21.2 victoria","index_name":"victoria","version_number":"21.2","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/victoria"},{"id":285,"display_name":"21.3 virginia","index_name":"virginia","version_number":"21.3","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/virginia"},{"id":220,"display_name":"21.04 Hirsute Hippo","index_name":"hirsute","version_number":"21.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/hirsute"},{"id":235,"display_name":"21.10 Impish Indri","index_name":"impish","version_number":"21.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/impish"},{"id":294,"display_name":"22 wilma","index_name":"wilma","version_number":"22","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/wilma"},{"id":147,"display_name":"22 Fedora 22","index_name":"22","version_number":"22.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/22"},{"id":303,"display_name":"22.1 xia","index_name":"xia","version_number":"22.1","distro_name":"LinuxMint","package_type":"deb","os_dist":"linuxmint/xia"},{"id":251,"display_name":"3.0 Zeus","index_name":"zeus","version_number":"3.0","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/zeus"},{"id":252,"display_name":"3.1 Dunfell","index_name":"dunfell","version_number":"3.1","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/dunfell"},{"id":228,"display_name":"3.13","index_name":"v3.13","version_number":"3.13","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.13"},{"id":262,"display_name":"3.14","index_name":"v3.14","version_number":"3.14","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.14"},{"id":263,"display_name":"3.15","index_name":"v3.15","version_number":"3.15","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.15"},{"id":264,"display_name":"3.16","index_name":"v3.16","version_number":"3.16","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.16"},{"id":265,"display_name":"3.17","index_name":"v3.17","version_number":"3.17","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.17"},{"id":277,"display_name":"3.18","index_name":"v3.18","version_number":"3.18","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.18"},{"id":286,"display_name":"3.19","index_name":"v3.19","version_number":"3.19","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.19"},{"id":253,"display_name":"3.2 Gatesgarth","index_name":"gatesgarth","version_number":"3.2","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/gatesgarth"},{"id":295,"display_name":"3.20","index_name":"v3.20","version_number":"3.20","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.20"},{"id":304,"display_name":"3.21","index_name":"v3.21","version_number":"3.21","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.21"},{"id":305,"display_name":"3.22","index_name":"v3.22","version_number":"3.22","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.22"},{"id":321,"display_name":"3.23","index_name":"v3.23","version_number":"3.23","distro_name":"Alpine Linux","package_type":"alpine","os_dist":"alpine/v3.23"},{"id":254,"display_name":"3.3 Hardknott","index_name":"hardknott","version_number":"3.3","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/hardknott"},{"id":255,"display_name":"3.4 Honister","index_name":"honister","version_number":"3.4","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/honister"},{"id":256,"display_name":"4.0 Kirkstone","index_name":"kirkstone","version_number":"4.0","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/kirkstone"},{"id":257,"display_name":"4.1 Langdale","index_name":"langdale","version_number":"4.1","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/langdale"},{"id":258,"display_name":"4.2 Mickledore","index_name":"mickledore","version_number":"4.2","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/mickledore"},{"id":271,"display_name":"4.3 Nanbield","index_name":"nanbield","version_number":"4.3","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/nanbield"},{"id":237,"display_name":"22.04 Jammy Jellyfish","index_name":"jammy","version_number":"22.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/jammy"},{"id":261,"display_name":"22.10 Kinetic Kudu","index_name":"kinetic","version_number":"22.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/kinetic"},{"id":151,"display_name":"23 Fedora 23","index_name":"23","version_number":"23.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/23"},{"id":266,"display_name":"23.04 Lunar Lobster","index_name":"lunar","version_number":"23.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/lunar"},{"id":278,"display_name":"23.10 Mantic Minotaur","index_name":"mantic","version_number":"23.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/mantic"},{"id":169,"display_name":"24 Fedora 24","index_name":"24","version_number":"24.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/24"},{"id":284,"display_name":"24.04 LTS Noble Numbat","index_name":"noble","version_number":"24.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/noble"},{"id":300,"display_name":"24.10 Oracular Oriole","index_name":"oracular","version_number":"24.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/oracular"},{"id":179,"display_name":"25 Fedora 25","index_name":"25","version_number":"25.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/25"},{"id":309,"display_name":"25.04 Plucky Puffin","index_name":"plucky","version_number":"25.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/plucky"},{"id":315,"display_name":"25.10 Questing Quokka","index_name":"questing","version_number":"25.10","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/questing"},{"id":184,"display_name":"26 Fedora 26","index_name":"26","version_number":"26.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/26"},{"id":320,"display_name":"26.04 Resolute Raccoon","index_name":"resolute","version_number":"26.04","distro_name":"Ubuntu","package_type":"deb","os_dist":"ubuntu/resolute"},{"id":188,"display_name":"27 Fedora 27","index_name":"27","version_number":"27.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/27"},{"id":194,"display_name":"28 Fedora 28","index_name":"28","version_number":"28.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/28"},{"id":201,"display_name":"29 Fedora 29","index_name":"29","version_number":"29.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/29"},{"id":204,"display_name":"30 Fedora 30","index_name":"30","version_number":"30.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/30"},{"id":209,"display_name":"31 Fedora 31","index_name":"31","version_number":"31.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/31"},{"id":216,"display_name":"32 Fedora 32","index_name":"32","version_number":"32.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/32"},{"id":226,"display_name":"33 Fedora 33","index_name":"33","version_number":"33.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/33"},{"id":231,"display_name":"34 Fedora 34","index_name":"34","version_number":"34.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/34"},{"id":236,"display_name":"35 Fedora 35","index_name":"35","version_number":"35.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/35"},{"id":239,"display_name":"36 Fedora 36","index_name":"36","version_number":"36.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/36"},{"id":260,"display_name":"37 Fedora 37","index_name":"37","version_number":"37.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/37"},{"id":273,"display_name":"38 Fedora 38","index_name":"38","version_number":"38.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/38"},{"id":279,"display_name":"39 Fedora 39","index_name":"39","version_number":"39.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/39"},{"id":283,"display_name":"40 Fedora 40","index_name":"40","version_number":"40.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/40"},{"id":302,"display_name":"41 Fedora 41","index_name":"41","version_number":"41.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/41"},{"id":307,"display_name":"42 Fedora 42","index_name":"42","version_number":"42.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/42"},{"id":175,"display_name":"openSUSE Leap 42.1","index_name":"42.1","version_number":"42.1","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/42.1"},{"id":181,"display_name":"openSUSE Leap 42.2","index_name":"42.2","version_number":"42.2","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/42.2"},{"id":186,"display_name":"openSUSE Leap 42.3","index_name":"42.3","version_number":"42.3","distro_name":"openSUSE","package_type":"rpm","os_dist":"opensuse/42.3"},{"id":318,"display_name":"43 Fedora 43","index_name":"43","version_number":"43.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/43"},{"id":322,"display_name":"44 Fedora 44","index_name":"44","version_number":"44.0","distro_name":"Fedora","package_type":"rpm","os_dist":"fedora/44"},{"id":26,"display_name":"Enterprise Linux 5.0","index_name":"5","version_number":"5.0","distro_name":"Enterprise Linux (CentOS, Red Hat, Amazon Linux)","package_type":"rpm","os_dist":"el/5"},{"id":138,"display_name":"Scientific Linux 5.0","index_name":"5","version_number":"5.0","distro_name":"Scientific Linux","package_type":"rpm","os_dist":"scientific/5"},{"id":144,"display_name":"Oracle Linux 5.0","index_name":"5","version_number":"5.0","distro_name":"Oracle Linux","package_type":"rpm","os_dist":"ol/5"},{"id":200,"display_name":"5.0 juno","index_name":"juno","version_number":"5.0","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/juno"},{"id":287,"display_name":"5.0 Scarthgap","index_name":"scarthgap","version_number":"5.0","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/scarthgap"},{"id":229,"display_name":"5.1 hera","index_name":"hera","version_number":"5.1","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/hera"},{"id":301,"display_name":"5.1 Styhead","index_name":"styhead","version_number":"5.1","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/styhead"},{"id":306,"display_name":"5.2 Walnascar","index_name":"walnascar","version_number":"5.2","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/walnascar"},{"id":316,"display_name":"5.3 Whinlatter","index_name":"whinlatter","version_number":"5.3","distro_name":"poky (Yocto Project Reference Distribution)","package_type":"rpm","os_dist":"poky/whinlatter"},{"id":27,"display_name":"Enterprise Linux 6.0","index_name":"6","version_number":"6.0","distro_name":"Enterprise Linux (CentOS, Red Hat, Amazon Linux)","package_type":"rpm","os_dist":"el/6"},{"id":139,"display_name":"Scientific Linux 6.0","index_name":"6","version_number":"6.0","distro_name":"Scientific Linux","package_type":"rpm","os_dist":"scientific/6"},{"id":145,"display_name":"Oracle Linux 6.0","index_name":"6","version_number":"6.0","distro_name":"Oracle Linux","package_type":"rpm","os_dist":"ol/6"},{"id":268,"display_name":"6.0 odin","index_name":"odin","version_number":"6.0","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/odin"},{"id":269,"display_name":"6.1 jolnir","index_name":"jolnir","version_number":"6.1","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/jolnir"},{"id":24,"display_name":"7 wheezy","index_name":"wheezy","version_number":"7.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/wheezy"},{"id":308,"display_name":"Enterprise Linux 10.0","index_name":"10","version_number":"10.0","distro_name":"Enterprise Linux (CentOS, Red Hat, Amazon Linux)","package_type":"rpm","os_dist":"el/10"},{"id":140,"display_name":"Enterprise Linux 7.0","index_name":"7","version_number":"7.0","distro_name":"Enterprise Linux (CentOS, Red Hat, Amazon Linux)","package_type":"rpm","os_dist":"el/7"},{"id":141,"display_name":"Scientific Linux 7.0","index_name":"7","version_number":"7.0","distro_name":"Scientific Linux","package_type":"rpm","os_dist":"scientific/7"},{"id":146,"display_name":"Oracle Linux 7.0","index_name":"7","version_number":"7.0","distro_name":"Oracle Linux","package_type":"rpm","os_dist":"ol/7"},{"id":153,"display_name":"7 wheezy","index_name":"wheezy","version_number":"7.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/wheezy"},{"id":270,"display_name":"7.0 horus","index_name":"horus","version_number":"7.0","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/horus"},{"id":205,"display_name":"Enterprise Linux 8.0","index_name":"8","version_number":"8.0","distro_name":"Enterprise Linux (CentOS, Red Hat, Amazon Linux)","package_type":"rpm","os_dist":"el/8"},{"id":234,"display_name":"Oracle Linux 8.0","index_name":"8","version_number":"8.0","distro_name":"Oracle Linux","package_type":"rpm","os_dist":"ol/8"},{"id":154,"display_name":"8 jessie","index_name":"jessie","version_number":"8.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/jessie"},{"id":312,"display_name":"8.0 circe","index_name":"circe","version_number":"8.0","distro_name":"elementary OS","package_type":"deb","os_dist":"elementaryos/circe"},{"id":240,"display_name":"Enterprise Linux 9.0","index_name":"9","version_number":"9.0","distro_name":"Enterprise Linux (CentOS, Red Hat, Amazon Linux)","package_type":"rpm","os_dist":"el/9"},{"id":244,"display_name":"Oracle Linux 9.0","index_name":"9","version_number":"9.0","distro_name":"Oracle Linux","package_type":"rpm","os_dist":"ol/9"},{"id":155,"display_name":"9 stretch","index_name":"stretch","version_number":"9.0","distro_name":"Raspbian","package_type":"deb","os_dist":"raspbian/stretch"},{"id":298,"display_name":"datasets-v1","index_name":"datasets-v1","version_number":"datasets-v1","distro_name":"Huggingface","package_type":"huggingface","os_dist":"huggingface/datasets-v1"},{"id":297,"display_name":"models-v1","index_name":"models-v1","version_number":"models-v1","distro_name":"Huggingface","package_type":"huggingface","os_dist":"huggingface/models-v1"},{"id":289,"display_name":"modules-v1","index_name":"modules-v1","version_number":"modules-v1","distro_name":"Terraform","package_type":"terraform","os_dist":"terraform/modules-v1"},{"id":299,"display_name":"spaces-v1","index_name":"spaces-v1","version_number":"spaces-v1","distro_name":"Huggingface","package_type":"huggingface","os_dist":"huggingface/spaces-v1"},{"id":221,"display_name":"13 Trixie","index_name":"trixie","version_number":"13.0","distro_name":"Debian","package_type":"deb","os_dist":"debian/trixie"}]
+  }
+</script>
+
+
+<link rel="stylesheet" href="https://assets-production.packagecloud.io/assets/docs-ed9ed08889f70c09af7d336c83291a126863b6cda9d413cbd9f520955e8b1c74.css" media="all" /><div class="hero-section short"></div>
+<div class="doc-container" ng-controller="generalDocCtrl" ng-init="init()">
+  <div class="docs-header" id="docs-header">
+    <h1>Documentation</h1>
+    <p class="thin">General documentation on using the packagecloud.io Command-Line Interface (CLI) and automation tools.</p>
+  </div>
+  <div class="row">
+    <div class="docs-content col-md-12">
+      <a name="packages" class="title-anchor"></a>
+      <section>
+        <h2>Packages</h2>
+
+        <a name="what_is_package" class="anchor"></a>
+
+        <section>
+          <h3>What is a package?</h3>
+          <p>A <b>package</b> is a combination of <b>metadata</b>, <b>configuration</b>, and <b>software</b> that is prepared in a way that a package management program (for example: <a href="https://help.ubuntu.com/community/Repositories/CommandLine">apt</a> on Ubuntu, <a href="https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Deployment_Guide/c1-yum.html">yum</a> on Red Hat Enterprise Linux, <a href="https://pip.pypa.io/">pip</a> for Python packages and <a href="http://guides.rubygems.org/">gem</a> for RubyGems) can use to properly and reliably install software and related configuration data on a computer.
+          </p>
+        </section>
+
+        <a name="why_packages_useful" class="anchor"></a>
+
+        <section>
+          <h3>Why are packages useful?</h3>
+          <ul>
+            <li>Version information helps keep software up to date.</li>
+            <li>Metadata offers <b>visibility</b> in to what's installed where and why.</li>
+            <li><b>Reproducibility</b>: software is installed the same way, everywhere.</li>
+          </ul>
+        </section>
+
+        <a name="how_to_create_packages" class="anchor"></a>
+
+        <section>
+          <h3>How do I create packages?</h3>
+
+          <p>There are many tools for creating packages. Some tools are provided directly by Linux distributions. There are also many great third-party tools.</p>
+
+          <p>
+            Some popular tools that can be used to create packages:
+          </p>
+
+          <ul>
+            <li><a href="http://wiki.centos.org/HowTos/SetupRpmBuildEnvironment">rpmbuild</a> for RPM packages. Also, take a look <a href="https://fedoraproject.org/wiki/How_to_create_a_GNU_Hello_RPM_package">at this</a> tutorial.</li>
+            <li><a href="https://wiki.debian.org/IntroDebianPackaging">debuild</a> (includes an excellent tutorial) for DEB packages.</li>
+            <li><a href="https://docs.python.org/2/distutils/builtdist.html">distutils</a> for Python packages.</li>
+            <li><a href="http://guides.rubygems.org/make-your-own-gem/">gem</a> (includes an excellent tutorial) for RubyGems.</li>
+          </ul>
+
+          <p>
+            Advanced and third-party tools:
+          </p>
+
+          <ul>
+            <li><a href="http://fedoraproject.org/wiki/Using_Mock_to_test_package_builds">mock</a> a chroot-based system for building RPM packages in a clean room environment.</li>
+            <li><a href="https://wiki.ubuntu.com/PbuilderHowto">pbuilder</a> a chroot-based system for building DEB packages in a clean room environment. <a href="http://www.netfort.gr.jp/~dancer/software/pbuilder-doc/pbuilder-doc.html">This page</a> also includes some useful tips about pbuilder.</li>
+            <li><a href="http://honk.sigxcpu.org/projects/git-buildpackage/manual-html/gbp.html">git-buildpackage</a> a set of scripts that can be used to build DEB packages directly from git repositories.</li>
+            <li><a href="https://github.com/jordansissel/fpm">fpm</a> a third-party tool that allows users to quickly and easily make a variety of packages (including RPM and DEB packages).</li>
+            <li><a href="https://github.com/packpack/packpack">packpack</a> a simple tool to build RPM and Debian packages from git repositories.</li>
+          </ul>
+        </section>
+
+        <a name="which_types_of_packages" class="anchor"></a>
+        <section>
+          <h3>Which types of packages does <a href="https://packagecloud.io/">packagecloud.io</a> support?</h3>
+
+          <p>
+            Currently <a href="https://packagecloud.io/">packagecloud.io</a> supports:
+          </p>
+
+          <ul>
+            <li>RPM packages</li>
+            <li>DEB packages</li>
+            <li>Debian source packages (DSCs)</li>
+            <li>Java packages (Clojure, SBT, "fatjar")</li>
+            <li>Python packages (wheels, eggs, source distributions)</li>
+            <li>RubyGems</li>
+            <li>Node.js packages</li>
+            <li>Alpine</li>
+            <li>Generic files, e.g., .asc (e.g., signature files), .zip, etc.</li>
+          </ul>
+        </section>
+      </section>
+      <a name="repos" class="title-anchor"></a>
+      <section>
+        <h2>Repos</h2>
+
+        <a name="what_is_a_repo" class="anchor"></a>
+
+        <section>
+          <h3>What is a repo?</h3>
+          <p>A repo (also known as 'repository') is a collection of <a href="#what_is_package">packages</a> and some metadata describing a variety of attributes about the packages (for example: package versions, operating system version, dependencies, processor architecture, etc).</p>
+        </section>
+
+        <a name="what_is_a_pkgcloud_repo" class="anchor"></a>
+
+        <section>
+          <h3>What is a packagecloud repo?</h3>
+
+          <p>A packagecloud repo is a more advanced take on the traditional repo.</p>
+
+          <p>A single packagecloud repo can:</p>
+
+          <ul>
+            <li>Contain packages of any (or all!) supported types; for example Debian, RPM, RubyGem, and Python packages can all coexist in the same packagecloud repo.</li>
+            <li>Have packages for multiple Linux distributions; for example, if you have a Debian package that works for 2 versions of Ubuntu and 1 version of Debian you only need 1 packagecloud repo (see <a href="#push_pkg">pushing packages</a> for more info).</li>
+            <li>Issue <a href="#read_tokens">read tokens</a> to identify specific nodes and control access to a repo by specific node.</li>
+          </ul>
+        </section>
+
+        <a name="why_are_repos_useful" class="anchor"></a>
+        <section>
+          <h3>Why are <a href="#what_is_a_repo">repos</a> useful?</h3>
+
+          <p>Repos are useful because they:</p>
+
+          <ul>
+            <li>Allow you store several versions of the same package (useful for debugging purposes, security analysis, etc).</li>
+            <li>Typically include some verification mechanism (like <a href="#gpg">GPG</a>).</li>
+            <li>Offer a way for many remote machines to download and install the same packages.</li>
+            <li>Provide a way for software vendors to offer stable releases of software to customers.</li>
+          </ul>
+        </section>
+
+        <a name="how_to_create_repos" class="anchor"></a>
+
+        <section>
+          <h3>How do I create <a href="#what_is_a_repo">repos</a>?</h3>
+
+          <p>There are a few open source tools that you can use to create a repo. Some of the mostly commonly used tools are:</p>
+
+          <ul>
+            <li><a href="http://createrepo.baseurl.org">createrepo</a> or <a href="https://github.com/rpm-software-management/createrepo_c">createrepo_c</a> for creating and managing RPM package repos (also called YUM repos).</li>
+            <li><a href="https://wiki.debian.org/DebianRepository/SetupWithReprepro">reprepro</a> for creating and managing DEB package repos (also called APT repos).</li>
+            <li><a href="https://guides.rubygems.org/run-your-own-gem-server/">gem</a> for creating and managing RubyGem servers.</li>
+          </ul>
+
+          <p>Unfortunately, many of these tools are buggy, poorly documented, or difficult to use in production.</p>
+
+          <p>An excellent alternative is <a href="https://packagecloud.io/">packagecloud.io</a> ;) - you can read more about how to create repos with our command line tool <a href="#create_repo">here</a>. You can also create repos on <a href="https://packagecloud.io/">packagecloud.io</a> by logging in and clicking the <b>New Repository</b> button or by clicking <a href="https://packagecloud.io/repositories/new">here</a>.</p>
+          <p>We also have a walkthrough video demonstrating the repository creation process <a href="https://youtu.be/yS375M2CN8E">that can be viewed here.</a></p>
+        </section>
+
+        <a name="disable_filelists" class="anchor"></a>
+        <section>
+          <h3>Disabling filelists metadata</h3>
+          <p>APT and YUM repositories have metadata which contains a list of every file in every package. This metadata can be used by users to query a given a filename and determine which package wrote that file to the filesystem.</p>
+          <p>The major downside of this feature is that repositories with huge numbers of packages or packages with huge numbers of files (like Omnibus packages) will have extremely large file list metadata. This can cause long wait times for clients because their apt and yum clients will download this metadata to the system when refreshing the cached metadata for a repository. This excessive metadata download can also increase the length of configuration management runs and take up significant space on the user's disk.</p>
+          <p>In order to deal with this, repository owners can click the 'edit' link to the right of their repository on their homepage and check the checkbox which says "Disable filelist metadata". Save your changes by clicking update. This will trigger a re-index for your repository and your contents metadata will be empty.</p>
+          <i>NOTE: A package may check for dependency on another package by checking the existence of a file in the 'filelist metadata' of that other package. You should turn 'filelist metadata' back on if they encounter dependency issues.</i>
+        </section>
+
+        <a name="debian_component_support" class="anchor"></a>
+        <section>
+          <h3>Debian repository component support</h3>
+          <p>Since we make it easy to create and manage <a href="#how_to_create_repos">as many repositories as you want</a>, we feel there is no real need to support Debian repository components.</p>
+        </section>
+
+
+      </section>
+
+      <a name="security_features" class="title-anchor"></a>
+      <section>
+        <h2>Security Features</h2>
+
+        <a name="gpg" class="anchor"></a>
+
+        <p>NOTE: The security features explained below are features that our product provides to ensure secure integration with existing tools and industry standard client software. These features are provided in our cloud based multi-tenant product as part of our standard offering.</p>
+        <section>
+          <h3>GPG keys</h3>
+          <p>A <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GPG</a> key can be used to generate a <a href="http://en.wikipedia.org/wiki/Digital_signature">digital signature</a> (read more about how <a href="http://gnupg.org/gph/en/manual/x135.html">GPG generates and verifies digital signatures</a>).</p>
+          <p>Many package manage systems that come with Linux support two different types of GPG signatures. GPG signatures on packages themselves and GPG signatures on repository metadata. The distincition is very subtle, but very important.</p>
+          <h3>GPG signed packages</h3>
+          <p>If you want to GPG sign your packages, you should do so before uploading it to packagecloud. packagecloud <b>does not</b> modify your uploaded data in anyway, whatsoever. If you sign your packages before uploading them, they will be signed when downloaded.</p>
+          <p>packagecloud allows repository owners to upload the GPG key used to sign the packages in a repository. When you do this, the key URL will be included in the package manager config that is generated for the client host. This ensures the key will be downloaded, added to the keyring, and used to verify package signatures. Note that packagecloud only stores public keys. If you happen to upload a secret key, we'll discard the secret key data and store only the public key when we process your GPG key upload.</p>
+          <h3>GPG signed repository metadata<a name="gpg_signing" class="anchor"></a></h3>
+          <p>packagecloud <b>does</b> GPG sign repository metadata that we generate for your repository. We do this to ensure to our users that your repository metadata was generated by us.</p>
+          <p>If you've installed your packagecloud repository using the Bash script, Chef cookbook, or Puppet module there is nothing extra you need to do. All of those methods automatically install the correct GPG key for your repository.</p>
+          <h3>Adding and removing GPG keys</h3>
+          <p>For more information about adding or removing the GPG keys for a repository, visit the repository's page and click GPG. Read the next section to learn about how to export a GPG key that you've used to sign your packages so it can be uploaded to packagecloud.</p>
+          <h3>Exporting GPG keys</h3>
+          <p>To export a GPG key that you've used to sign packages uploaded to packagecloud, follow these instructions.<p>
+          <p>
+            <ol>
+              <li>Begin by running <code>gpg --list-keys --keyid-format=long</code>. This will print information about each GPG key in your keyring. It will look like this:
+                <!--googleoff: all--><pre>
+pub   2048R/F2BB309992AE12C3 2015-03-14
+uid                          Fake Name (test key) <test@test.com>
+sub   2048R/5F042FCD59BF0D31 2015-03-14
+                </pre><!--googleon: all-->
+              </li>
+              <li>Find the key ID for the package signing key you are using. In the example above, the key ID is <code>F2BB309992AE12C3</code>.</li>
+              <li>Export the public key by running: <code>gpg --armor --export keyid</code>, substituting <code>keyid</code> for your GPG key ID.</li>
+              <li>Copy and paste this output into the package key dialog located in the Package signing key section of the GPG tab on your repository.</li>
+            </ol>
+            <b>Note</b> that if you accidentally upload a secret key, packagecloud will extract the public key and discard your secret key. <b>We never store your secret key</b> data even if uploaded to us accidentally.
+          </p>
+          <h3>Learn more</h3>
+          <p>To learn more about the technical inner workings of GPG signing packages vs repository metadata, check out our blog posts about <a href="https://blog.packagecloud.io/how-to-gpg-sign-and-verify-deb-packages-and-apt-repositories/">GPG signing and verifying Debian packages and APT repositories</a> and <a href="https://blog.packagecloud.io/how-to-gpg-sign-and-verify-rpm-packages-and-yum-repositories/>GPG signing and verifying RPM packages and YUM repositories</a>.
+        </section>
+
+        <a name="gpg_migration" class="anchor"></a>
+        <section>
+          <h3>GPG key migration</h3>
+          <p>Some users have received notifications that they must migrate their repositories to
+          a new GPG key. This does not affect all repositories; only repositories created
+          prior to our new GPG key system being rolled out are affected.</p>
+          <h4>Legacy GPG keys</h4>
+          <p>In the early days of packagecloud, the service used a global GPG key to sign the
+             repository metadata generated for all APT and YUM repositories created.</p>
+          <p>This method works, but is a bit inflexible. Soon after we migrated to a new system
+          which uses <a href="https://aws.amazon.com/kms/">AWS Key Management Service</a> to
+          generate GPG signing keys per-repository.</p>
+          <h4>Per-repository GPG keys</h4>
+          <p>Whenever a repository is created on packagecloud,
+          a new GPG key is generated specifically for that repository to be used for signing
+          repository metadata.</p>
+          <p>We are now migrating all repositories that were created before this system was rolled
+          out over to this new system. Any repositories created after are fine as is and no
+          action is required.</p>
+          <h4>How to migrate</h4>
+          <p>The migration can be performed in stages and we encourage affected users to click the
+          GPG tab on their repository page to more information on how to perform the migration.</p>
+          <p>Any repository that is not migrated will be automatically migrated on January 7, 2019.</p>
+        </section>
+
+        <a name="https" class="anchor"></a>
+        <section>
+          <h3>HTTPS</h3>
+
+          <p>Both <a href="#public_private_repos">public and private repos</a> have their metadata and package files served up over <a href="http://en.wikipedia.org/wiki/HTTP_Secure">HTTPS</a> to prevent <a href="http://en.wikipedia.org/wiki/Man-in-the-middle_attack">MITM</a> attacks.</p>
+          <p>packagecloud <a href="#install_repo">repo install scripts</a> explicitly turn on certificate verification when possible.</p>
+        </section>
+
+        <a name="public_private_repos" class="anchor"></a>
+        <section>
+          <h3>Public / Private Repos</h3>
+
+          <p>packagecloud allows you to create as many public repos as you like. Depending on your <a href="https://packagecloud.io/pricing">plan</a> you may also be able to create private repos, as well.</p>
+          <b>Public repos</b> are:
+          <ul>
+            <li>Read accessible by anyone.</li>
+            <li>Best suited for companies and individuals who are intending to distribute open source software.</li>
+            <li>The repo owner and the specified <a href="#collaborators">collaborators</a> may push packages to the repo.</li>
+          </ul>
+          <b>Private repos</b> are:
+          <ul>
+            <li>Read accessible only with a read token</li>
+            <li>Best suited for companies and individuals who have proprietary software.</li>
+            <li>The repo owner and the specified <a href="#collaborators">collaborators</a> may push packages to the repo.</li>
+          </ul>
+        </section>
+
+        <a name="collaborators" class="anchor"></a>
+        <section>
+          <h3>Collaborators</h3>
+          <p>packagecloud allows you to authorize other packagecloud users to <a href="#push_pkg">push</a> packages to and <a href="#yank_pkg">yank</a> packages from your
+             repos, as well as <a href="#promote_pkg">promote</a> packages to other repositories.</p>
+          <p>You can add or remove collaborators by clicking the <b>edit</b> link found next to a repo name when you log in to packagecloud.</p>
+        </section>
+      </section>
+
+      <a name="alpine" class="title-anchor"></a>
+
+      <section>
+        <h2>Alpine</h2>
+        <section>
+          <a name="alpine_any" class="title-anchor"></a>
+          <h3>Pushing and installing alpine_any packages</h3>
+          <hr />
+
+<h4>About alpine_any packages</h4>
+<p>Alpine packages, uploaded as alpine_any, can be created to work on any alpine distro. This allows for a single package for every version, which can serve for all alpine-based Linuxes.</p>
+
+<h3>Pushing a package using the CLI:</h3>
+<p>You can push a alpine alpine_any/alpine_any package <a href="https://www.rubydoc.info/gems/package_cloud/">using the packagecloud CLI</a>, like so:</p>
+<!--googleoff: all--><pre>
+package_cloud push &lt;username&gt;/&lt;reponame&gt;/alpine_any/alpine_any &lt;alpine file&gt;</pre><!--googleon: all-->
+
+<h3>Using the alpine_any/alpine_any repo for installation:</h3>
+<ol>
+  <li>
+    Create a repo definition pointing to the alpine_any/alpine_any repo on packagecloud, and store it in <code>/etc/apk/repositories/</code>. Example:
+    <!--googleoff: all--><pre class="labeled">/etc/apk/repositories</pre><!--googleon: all-->
+    Alpine repository definitions like this can be added to the file:
+    <!--googleoff: all--><pre class="labeled">
+    https://packagecloud.io/username/reponame/alpine_any/alpine_any/main
+    </pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Update and get the metadata for the alpine_any/alpine_any repo on packagecloud. This command below will pull in the packages available on the repo you defined.
+    <!--googleoff: all--><pre class="labeled">apk update</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Confirm the metadata from the repo you added by running:
+    <!--googleoff: all--><pre class="labeled">ls -ltr /var/cache/apk/</pre><!--googleon: all-->
+    The content should show as many APKINDEX.xxxxxx.tar.gz files as there are repositories in /etc/apk/repositories, with current date/time
+  </li>
+
+  <li>
+    Confirm the package you want is coming from the repo you defined: 
+    <!--googleoff: all--><pre class="labeled">apk policy &lt;package name&gt;</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Install the desired package with <code>apk add</code>:
+    <!--googleoff: all--><pre class="labeled">apk add &lt;package name&gt;</pre><!--googleon: all-->
+  </li>
+</ol>
+
+        </section>
+      </section>
+
+      <a name="rpm" class="title-anchor"></a>
+
+      <section>
+        <h2>RPM</h2>
+        <section>
+          <a name="rpm_any" class="title-anchor"></a>
+          <h3>Pushing and installing rpm_any packages</h3>
+          <hr />
+
+<h4>About rpm_any packages</h4>
+<p>RPM packages, uploaded as rpm_any, can be created to work on any rpm distros. This allows for a single package for every version, which can serve for all rpm-based Linuxes.</p>
+
+<h3>Pushing a package using the CLI:</h3>
+<p>You can push a rpm rpm_any/rpm_any package <a href="https://www.rubydoc.info/gems/package_cloud/">using the packagecloud CLI</a>, like so:</p>
+<!--googleoff: all--><pre>
+package_cloud push &lt;username&gt;/&lt;reponame&gt;/rpm_any/rpm_any &lt;rpm file&gt;</pre><!--googleon: all-->
+
+<h3>Using the rpm_any/rpm_any repo for installation:</h3>
+<ol>
+  <li>
+    Create a repo definition pointing to the rpm_any/rpm_any repo on packagecloud, and store it in <code>/etc/yum.repos.d/</code>. The filename MUST have the extension <code>.repo</code>. Example:
+    <!--googleoff: all--><pre class="labeled">/etc/yum.repos.d/username_reponame_rpm_any.repo</pre><!--googleon: all-->
+    The file content should be:
+    <!--googleoff: all--><pre class="labeled">
+    [username_reponame_rpm_any]
+    name=username_reponame_rpm_any
+    baseurl=https://packagecloud.io/username/reponame/rpm_any/rpm_any/$basearch
+    repo_gpgcheck=1
+    gpgcheck=0
+    enabled=1
+    gpgkey=https://packagecloud.io/username/reponame/gpgkey
+    sslverify=1
+    sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+    metadata_expire=300</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Update and get the metadata for the rpm_any/rpm_any repo on packagecloud. This command below will pull in the packages available on the repo pointed to by <code>username_reponame_rpm_any</code>, and you will be prompted to accept the GPG key of the repo.
+    <!--googleoff: all--><pre class="labeled">yum update --disablerepo=* --enablerepo=username_reponame_rpm_any</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Confirm all available packages from the repo you added by running: 
+    <!--googleoff: all--><pre class="labeled">yum list | grep username_reponame_rpm_any</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Install the desired package with <code>yum install</code> or the below command, which will ensure you will install the package only from the repo pointed to by <code>username_reponame_rpm_any</code>
+    <!--googleoff: all--><pre class="labeled">yum install &lt;package name&gt; --disablerepo=* --enablerepo=username_reponame_rpm_any</pre><!--googleon: all-->
+  </li>
+</ol>
+<p>Questions? We're here to help! Email <a href="mailto:support@packagecloud.io">support@packagecloud.io</a></p>
+
+        </section>
+      </section>
+
+      <a name="deb" class="title-anchor"></a>
+
+      <section>
+        <h2>Deb</h2>
+        <section>
+          <a name="deb_any" class="title-anchor"></a>
+          <h3>Pushing and installing deb any/any packages</h3>
+          <hr />
+
+<h4>About deb any/any packages</h4>
+<p>Deb packages, uploaded as deb any/any, can be created to work on any deb distros. This allows for a single package for every version, which can serve for all deb-based Linuxes.</p>
+
+<h3>Pushing a package using the CLI:</h3>
+<p>You can push a deb any/any package <a href="https://www.rubydoc.info/gems/package_cloud/">using the packagecloud CLI</a>, like so:</p>
+<!--googleoff: all--><pre>package_cloud push &lt;username&gt;/&lt;reponame&gt;/any/any &lt;deb file&gt;</pre><!--googleon: all-->
+
+<h3>Using the any/any repo for installation:</h3>
+<ol>
+  <li>
+    Create a repo definition pointing to the any/any repo on packagecloud, and store it in <code>/etc/apt/sources.list.d/</code>. The filename MUST have the extension <code>.list</code>. Example:
+    <!--googleoff: all--><pre class="labeled">/etc/apt/sources.list.d/username_reponame_deb_any.list</pre><!--googleon: all-->
+    The file content should be:
+    <!--googleoff: all--><pre class="labeled">
+    deb https://packagecloud.io/username/reponame/any/ any main
+    deb-src https://packagecloud.io/username/reponame/any/ any main</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Update and get the metadata for the any/any repo on packagecloud. This command will pull in the packages available on the repo pointed to by <code>username_reponame_deb_any</code>.
+    <!--googleoff: all--><pre class="labeled">
+    sudo apt-get update \
+    -o Dir::Etc::sourcelist="sources.list.d/username_reponame_deb_any.list" \
+    -o Dir::Etc::sourceparts="-" \
+    -o APT::Get::List-Cleanup="0"</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Confirm the metadata from the repo you added by running:
+    <!--googleoff: all--><pre class="labeled">ls /var/apt/lists/</pre><!--googleon: all-->
+    The content should display the following:
+    <!--googleoff: all--><pre class="labeled">packagecloud.io_username_repo_any_dists_any_InRelease</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Review which repo the package is coming from:
+    <!--googleoff: all--><pre class="labeled">apt-get install --print-uris &lt;package name&gt;</pre><!--googleon: all-->
+  </li>
+
+  <li>
+    Install the desired package:
+    <!--googleoff: all--><pre class="labeled">apt-get install &lt;package name&gt;</pre><!--googleon: all-->
+  </li>
+</ol>
+
+        </section>
+      </section>
+
+      <a name="rubygems" class="title-anchor"></a>
+
+      <section>
+        <h2>RubyGems</h2>
+        <section>
+          <a name="bundler" class="title-anchor"></a>
+          <h3>Bundler</h3>
+          <h3>Adding the packagecloud repository to your Gemfile</h3>
+
+<hr />
+
+<h4>Bundler 1.7.0 and above</h4>
+<p>In newer bundler versions, you can scope specific gems to a source, like so:</p>
+
+<h3>public repos:</h3>
+<p>For public repositories, you'll only need to add it as a source to your Gemfile.</p>
+<!--googleoff: all--><pre>
+# Gemfile
+#
+# Note: It's recommended you add the official https://rubygems.org source, unless your
+#       packagecloud repository can meet all of the dependency requirements in the Gemfile.
+
+source "https://rubygems.org"
+source "https://packagecloud.io/user/publicRepo" do
+  gem "my-gem"
+  gem "another-gem"
+end</pre><!--googleon: all-->
+<h3>private repos:</h3>
+<p>To install gems from a private repository, you'll need to add it as a source to your Gemfile with a read token. See <a href="#generate_read_token">generating read tokens</a>. </p>
+<!--googleoff: all--><pre>
+# Gemfile
+# Replace ${token} with a valid read token
+
+source "https://rubygems.org"
+source "https://${token}:@packagecloud.io/user/privateRepo" do
+  gem "my-private-gem"
+  gem "another-private-gem"
+end</pre><!--googleon: all-->
+
+  
+<h3>Legacy versions of Bundler</h3>
+<p>Older versions of Bundler have several bugs around scoping gems to a single source using blocks, so you'll have to add the source globally at the top of the Gemfile.</p>
+
+  <h3>public repos:</h3>
+  <!--googleoff: all--><pre class="pre-regular-source">
+# Gemfile
+
+source "https://rubygems.org"
+source "https://packagecloud.io/user/publicRepo"</pre><!--googleon: all-->
+<h3>private repos:</h3>
+  <!--googleoff: all--><pre class="pre-regular-source">
+# Gemfile
+# Replace ${token} with a valid read token.
+
+source "https://rubygems.org"
+source "https://${token}:@packagecloud.io/user/privateRepo"</pre><!--googleon: all-->
+
+        </section>
+
+      </section>
+
+      <a name="python" class="title-anchor"></a>
+
+      <section>
+        <h2>Python</h2>
+        <section>
+          <a name="venv" class="title-anchor"></a>
+          <h3>VirtualEnv</h3>
+          <h3>Adding the repository to your VirtualEnv</h3>
+
+<p>Ensure you are running the latest version of pip inside your virtualenv:</p>
+<!--googleoff: all--><pre>my_virtualenv/bin/pip install --upgrade pip</pre><!--googleon: all-->
+
+<h3>public repos:</h3>
+<p>Add this to the bottom of your <code>requirements.txt</code></p>
+<!--googleoff: all--><pre>--extra-index-url=https://packagecloud.io/user/publicRepo/pypi/simple</pre><!--googleon: all-->
+<h3>private repos:</h3>
+<p>Append the repository to <code>requirements.txt</code> using a read token. Replace <code>${token}</code> with your generated read token. See <a href="#generate_read_token">generating read tokens</a>.</p>
+  <!--googleoff: all--><pre>--extra-index-url=https://${token}:@packagecloud.io/user/privateRepo/pypi/simple</pre><!--googleon: all-->
+<p>
+  <i>Note: if you would like pip to use <b>only</b> this repository as a source, replace <code>extra-index-url</code> with <code>index-url</code></i>
+</p>
+
+        </section>
+
+      </section>
+
+      <a name="node"></a>
+
+      <section>
+        <h2>NodeJS</h2>
+        <section>
+          <a name="node_npm"></a>
+          <h3>Configure an npm registry</h3>
+          <a name="npm_set_repository_url"></a>
+<p>Use the <code>npm config set registry &lt;url&gt;</code> command to set the npm registry for your system.</p>
+<p>This command will create an <code>.npmrc</code> file with the custom registry url in the current user's home directory.
+The <code>url</code> should be a fully-qualified url to a packagecloud repository and <strong>must</strong> include the trailing <code>npm/</code>.</p>
+
+<p>For example, to set the npm registry to <code>example-user</code>'s repository named <code>example-repo</code>,
+you would run the following command: </p>
+
+<!--googleoff: all--><pre>npm config set registry <code>https://packagecloud.io/example-user/example-repo<strong>/npm/</strong></code></pre><!--googleon: all-->
+
+<p>Follow the directions in the next sections to set up <a href="#npm_read_only">read-only access</a> or
+<a href="#npm_read_and_write">read and write access</a> to the repository.</p>
+
+<a name="npm_read_only"></a>
+<h3>Read only access to npm repositories</h3>
+<h4>Public npm repositories</h4>
+<p>If the repostory is a public repository, your system will have read access to the repository after running <code>npm config set registry &lt;url&gt;</code>
+as described in the previous section.<p>
+
+<p>You can install packages by simply running <code>npm install [packagename]</code>.</p>
+
+<h4>Private npm repositories</h4>
+<p>To configure read only access to a private npm registry, use the repository installation scripts which can be found
+in the <span class="inline-kbd"><span class="glyphicon glyphicon-download"></span>Installation</span> section on a repository page.</p>
+<p>Alternatively, you can create a <a href="#read_tokens">read token</a> and and set the <code>_authToken</code> manually by editing the <code>.npmrc</code> file
+in your user's home directory.</p>
+<i><code>.npmrc</code> file:</i><br/>
+<!--googleoff: all--><pre>
+always-auth=true
+registry=<code>https://packagecloud.io/example-user/example-repo<strong>/npm/</strong></code>
+//packagecloud.io/example-user/example-repo/npm/:_authToken=<code>f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0</code>
+</pre><!--googleon: all-->
+<i>Note: The registry url <strong>must</strong> end in <strong>/npm/</strong></i>
+<p>The <code>_authToken</code> must be a valid <a href="#read_token">read token</a> generated from a repository <a href="#master_tokens">master token</a>. Learn more about <a href="#read_tokens">read tokens</a> in these docs.</p>
+<p>The <code>always-auth</code> field is required when using <b><a href="#node_yarn">Yarn</a></b> with a private repository.</p>
+
+
+<a name="npm_read_and_write"></a>
+<h3>Read and write access to npm repositories</h3>
+<p>You should only follow these instructions on systems and environments where you need write access to your repository. If you just need
+to run <code>npm install</code> to install packages, you should follow the <a href="#npm_read_only">read only access guide</a> above.</p>
+
+<a name="npm_login"></a>
+<h4>npm login</h4>
+<p>After you have set your repository URL by following <a href="#npm_set_repository_url">the guide above</a>, you
+are ready to use <code>npm login</code> to give yourself write access to the repository.</p>
+
+<p>Start by using the <code>npm login</code> command. Running this command
+will modify the <code>.npmrc</code> file in your home directory to include an authentication token that has write access.</p>
+
+<p>When running the <code>npm login</code> command, you will be prompted for a username, password, and email address.
+Use your packagecloud account name, your packagecloud account password, and packagecloud account email address, respectively.</p>
+
+<p>For example, if your packagecloud username is <code>example-user</code> and the email address registered to your account is
+<code>example-user@company.com</code>, you would run <code>npm login</code> and respond like this:
+
+<!--googleoff: all--><pre>
+~/Projects/example-project $ npm login
+Username: example-user
+Password: **************
+Email: (this IS public) example-user@company.com
+Logged in as example-user on https://packagecloud.io/example-user/example-repo/npm/.
+</pre><!--googleon: all-->
+
+<a name="npm_publish"></a>
+<h4>npm publish</h4>
+<p>After you have followed the <a href="#npm_login">npm login</a> section above, you
+are ready to use <code>npm publish</code>.</p>
+
+<p>Use the <code>npm</code> cli to publish packages to your packagecloud registry.
+Run <code>npm publish &lt;tarball&gt;</code> or <code>npm publish</code>
+from inside a project root containing a <code>package.json</code> to publish
+packages to a configured registry.</p>
+
+<p>You can also use the <a href="#cli">packagecloud CLI</a>, API, or web
+interface to upload packages to the npm registry.</p>
+
+<a name="node_scoped"></a>
+<h3>Scoped packages</h3>
+<p>Scoped packages are supported on packagecloud. Install scoped packages by including the scope in the package name.</p>
+<!--googleoff: all--><pre>
+npm install @example/package
+</pre><!--googleon: all-->
+<p>Publishing scoped packages is also supported. Use the <code>npm publish</code> command, packagecloud CLI, or web UI to upload packages.
+Ensure the scope is included in the package name field inside the <code>package.json</code>.</p>
+<!--googleoff: all--><pre>
+npm publish example-package-v0.1.0.tgz
+</pre><!--googleon: all-->
+
+<a name="node_unpublish"></a>
+<h3>Remove / unpublish packages from the registry </h3>
+<p>To remove packages from your packagecloud registry, you can use the <a href="#cli">packagecloud CLI</a> or the API directly to delete the package.</p>
+<p>CLI Example:</p>
+<!--googleoff: all--><pre>
+package_cloud yank example-user/example-repository/node example-1.0.tgz
+</pre><!--googleon: all-->
+
+<p>To remove scoped packages from your packagecloud registry, you pass the scope to the CLI, like so:</p>
+<!--googleoff: all--><pre>
+package_cloud yank example-user/example-repository/node @myuser/example-1.0.tgz
+</pre><!--googleon: all-->
+
+<p>You can also delete packages from the web UI by visiting the repository page, selecting the package you want to delete, and choosing delete from the options presented. Deleting the package will trigger a reindex of the registry metadata.</p>
+
+<a name="npm_proxy"></a>
+<h3>Transparent auto-proxying</h3>
+<p>When you install a package using <code>npm install</code>, the <code>npm</code> program will automatically
+attempt to install any dependencies required by the package. If those dependencies are not found in your
+packagecloud repository, packagecloud will automatically forward requests for those missing dependencies to the official
+npm public registry.</p>
+
+<p>This is the default behavior and is recommended for most users.</p>
+
+<p>If you do not want to rely on the official npm public registry at all, you can disable the automatic forwarding
+of requests. However, once this behavior is disabled, you will need to upload your packages and all
+required dependencies to your packagecloud repository. To disable automatic proxying to the
+official npm public registry for missing dependencies, visit the settings page for the repository and
+uncheck the "Enable proxying from the official npm registry" checkbox.</p>
+
+<p>If you decide to disable this behavior, you will have to upload <i>every</i>
+dependency for <i>every</i> package you upload. <code>npm install</code> commands
+will fail if any dependencies are missing from your packagecloud repository
+because <code>npm install</code> will no longer be able to rely on the
+official npm public registry.</p>
+
+<a name="node_yarn"></a>
+<h3>Using Yarn</h3>
+<p>Once a system is configured to use a packagecloud repository as an npm registry, either by following the manual installation instructions, or by using the repository install scripts provided by packagecloud, it can install packages via <b>Yarn</b> by using <code>yarn add &lt;packagename&gt;</code>. No other configuration is necessary.</p>
+<!--googleoff: all--><pre>yarn add packagename@0.1.0</pre><!--googleon: all-->
+
+<a name="dist_tags"></a>
+<h3>npm dist tags</h3>
+<p>npm supports a useful feature called distribution tags  (or dist tags) for short. You can learn about
+<a href="https://docs.npmjs.com/getting-started/using-tags">dist tags by reading the npm documentation</a>.</p>
+<p>Please read the important notes about dist tags in the sections that follow. The behavior of dist tags with
+package publish, promote, and delete may not be what you expect!</p>
+<p>In short, npm dist tags allow npm package owners to associate arbitrary strings with npm package versions.
+All packages have at least one dist tag: the "latest" dist tag. The "latest" dist tag is automatically
+set to the most recently uploaded version of a package. When you run <code>npm install package</code>, your npm
+command line client automatically installs the version tagged with "latest".</p>
+<p>You can create arbitrary dist tags (for example: alpha, beta, testing, stable, etc) that map to
+particular versions of a package. A user can then use that dist tag to install the version of a package mapped
+to that tag.</p>
+<p>For example: you may decide that version 2.0 of example-package is the current beta version, so you create
+a dist tag mapping "beta" to version 2.0. Any user who wants to install the beta, can simply run
+<code>npm install example-package@beta</code>.</p>
+<p>The npm API for adding, removing, and listing <a href="https://docs.npmjs.com/getting-started/using-tags">dist tags</a>
+is fully supported by packagecloud. This means you can run commands like: <code>npm dist-tag ls package-name</code> or
+<code>npm dist-tag add package-name@2.0 beta</code> to list or add dist tags, respectively.</p>
+
+<a name="node_publish"></a>
+<h3>Publishing a package and distribution tags (dist tags)</h3>
+<p>In order to maintain API compatibility with the official npm registry and its API you should be be aware that
+when uploading a Node.js package with the:</p>
+<ul>
+<li>Web-based graphical upload dialog, the package uploaded will be marked as
+the latest version <i>regardless</i> of its version string.</li>
+<li><a href="https://packagecloud.io/docs#cli">package_cloud command
+  line client</a>, the package uploaded will be marked as the latest version <i>regardless</i> of its version string.</li>
+<li><code>npm publish</code> command without specifying a distribution tag,
+  the newly published package will be marked as the latest version <i>regardless</i> of its version string.</li>
+<li><code>npm publish</code> command and also specifying a distribution tag
+  using the <code>--tag</code> option, the newly published package will be marked with the specified dist tag. The "latest"
+  distribution tag will remain unchanged and will be set to whichever version it was set to (if any).</li>
+</ul>
+
+<p>You can add, remove, or list dist tags using the
+<a href="https://docs.npmjs.com/getting-started/using-tags">npm dist-tags command</a>
+to modify the dist tags, manually.</p>
+
+<a name="node_promote"></a>
+<h3>Node package promotion and distribution tags (dist tags)</h3>
+<p>When you <a href="#promote_pkg">promote a package</a>, the package is removed from the source repository and exists
+only in the destination repository at the completion of the command.</p>
+
+<p>When a Node.js package is promoted, the follow things occur:</p>
+<ol>
+  <li>All distribution tags associated with that package are <b>deleted</b>.</li>
+  <li>The remaining versions of the package in the original repository (where the package was moved from) will be sorted
+      according to the version. The most recent version string is marked as the latest (even if it already has another dist tag).</li>
+  <li>Once the package reaches the destination repository, it will be marked as latest if (and only if) no other versions of the same package
+      exist at the destination. If other versions exist, the version that was just moved has no dist tag associated with it, even if the
+      semantic version is the latest.</li>
+</ol>
+<p>This is done to mimic the official npm repository as closely as possible. You can use the
+<a href="https://docs.npmjs.com/getting-started/using-tags">npm dist-tags command</a>
+to create, remove, or adjust any dist tags you need after promoting a package.</p>
+
+<a name="node_delete"></a>
+<h3>Node package deletion and distribution tags (dist tags)</h3>
+<p>When you <a href="https://packagecloud/docs#yank">delete (or yank) a Node.js package</a> the version strings of all remaining
+versions for that package are sorted and the most recent version is marked as "latest" even if there is already another dist tag associated
+with that version. This is done to maintain API compatibility with the official npm registry and its API.</p>
+
+        </section>
+
+      </section>
+
+      <section>
+        <h2>Helm</h2>
+        <section>
+          <a name="helm"></a>
+          <h3>Configure Helm repository</h3>
+          <a name="helm_set_repository_url"></a>
+<p>Use <code>helm repo add &lt;reponame&gt; &lt;url&gt;</code> command to set the Helm repository for your system.</p>
+<p><code>&lt;reponame&gt;</code> can be anything of your choice and has significance only our your system.</p>
+<p>This command will create a <code>repositories.yaml</code> file with the custom registry url in:
+<ul>
+  <li>Linux: $HOME/.config/helm</li>
+  <li>MacOS: $HOME/Library/Preferences/helm</li>
+  <li>Windows: %APPDATA%\helm</li>
+</ul>
+The <code>url</code> should be a fully-qualified url to a packagecloud repository and <strong>must</strong> include the trailing <code>helm/</code>.</p>
+
+<p>For example, to set the Helm repository to <code>example-user</code>'s repository named <code>example-repo</code>,
+you would run the following command: </p>
+
+<!--googleoff: all--><pre>helm repo add &lt;reponame&gt <code>https://packagecloud.io/example-user/example-repo<strong>/helm/</strong></code></pre><!--googleon: all-->
+
+<h3>Public Helm repositories</h3>
+<p>If the repostory is a public repository, your system will have read access to the repository after running <code>helm repo add &lt;reponame&gt &lt;url&gt;</code> as described in the previous section.<p>
+
+<p>You can install charts by simply running <code>helm install [release_name] [package_name]</code>.</p>
+
+<h3>Private Helm repositories</h3>
+<p>To configure read only access to a private Helm registry, use the repository installation scripts which can be found
+in the <span class="inline-kbd"><span class="glyphicon glyphicon-download"></span>Installation</span> section on a repository page.</p>
+<p>Alternatively, you can create a <a href="#read_tokens">read token</a> and and set the <code>_authToken</code> manually use <code>helm repo add --password &lt;password&gt &lt;reponame&gt &lt;url&gt</code></p>
+
+<p>The <code>_authToken</code> must be a valid <a href="#read_token">read token</a> generated from a repository <a href="#master_tokens">master token</a>. Learn more about <a href="#read_tokens">read tokens</a> in these docs.</p>
+
+<a name="helm_unpublish"></a>
+<h3>Remove / unpublish packages from the registry </h3>
+<p>To remove packages from your packagecloud registry, you can use the <a href="#cli">packagecloud CLI</a> or the API directly to delete the package.</p>
+<p>CLI Example:</p>
+<p>`v1` is the index version</p>
+<!--googleoff: all--><pre>
+package_cloud yank example-user/example-repo/helm/v1 example-1.0.tgz
+</pre><!--googleon: all-->
+
+<p>You can also delete packages from the web UI by visiting the repository page, selecting the package you want to delete, and choosing delete from the options presented. Deleting the package will trigger a reindex of the registry metadata.</p>
+
+<a name="helm_promote"></a>
+<h3>Helm package promotion</h3>
+<p>When you <a href="#promote_pkg">promote a package</a>, the package is removed from the source repository and exists
+only in the destination repository at the completion of the command.</p>
+
+
+<p>CLI Example:</p>
+<p>`v1` is the index version</p>
+<!--googleoff: all--><pre>
+package_cloud promote example-user/example-repo/helm/v1 example-1.0.tgz target-user/target-repo
+</pre><!--googleon: all-->
+
+        </section>
+
+      </section>
+
+
+      <a name="token_auth" class="title-anchor"></a>
+
+      <section>
+        <h2>Token Auth</h2>
+        <br/>
+        <br/>
+
+        <p>
+          We support a sophisticated multi-level authentication system that facilitates a wide variety of use cases for private repos. There are three different kinds of tokens: <a href="#master_tokens">master tokens</a>, <a href="#read_tokens">read tokens</a> and <a href="/docs/api#api_tokens">API tokens</a>.
+        </p>
+
+        <a name="token_capabilities" class="anchor"></a>
+        <section>
+          <h3>Token Capabilities</h3>
+          <table class="tables">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Create Read Tokens</th>
+                <th>Read Repository Metadata*</th>
+                <th>Download Packages</th>
+                <th>Upload Packages</th>
+                <th>Use Case</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="#read_tokens">Read Tokens</a></td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>Package Managers</td>
+              </tr>
+              <tr>
+                <td><a href="#master_tokens">Master Tokens</a></td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+                <td>Creating <a href="#read_tokens">Read Tokens</a></td>
+              </tr>
+              <tr>
+                <td><a href="/docs/api#api_tokens">API Tokens</a></td>
+                <td>Yes</td>
+                <td>No**</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Automation</td>
+              </tr>
+            </tbody>
+          </table>
+          <p><i>* This includes downloading packages made available through repository metadata.</i></p>
+          <p><i>** For compatibility with the npm tool, API tokens can <a href="#npm_read_and_write">read and write to npm registries</a>.</i></p>
+        </section>
+
+        <a name="master_tokens" class="anchor"></a>
+        <section>
+          <h3>Master Tokens</h3>
+
+          <p>Master tokens are at the top level and <b>their only purpose is generating descendent read tokens</b>.</p>
+
+          <p>
+            Master tokens can't be used for reading from repos, pushing packages, modifying configurations, or doing anything else. <b>That means that you can safely give master tokens to customers, embed them in configuration management manifests, or otherwise distribute them to untrusted parties.</b>
+          </p>
+
+          <p>
+            Each repo comes with a default master token. If you don't have a need for maintaining fine-grained access control to your repos, then all packagecloud functionality will automatically use the default master token transparently to you.
+          </p>
+
+          <p>Master tokens can be generated and destroyed with the <a href="#cli"><tt>package_cloud</tt> command line client</a>. For example, to create a new token named test, you would run the following command:
+
+            <!--googleoff: all--><pre>&gt; package_cloud master_token create username/reponame master_token_name</pre><!--googleon: all--></p>
+        </section>
+
+        <a name="read_tokens" class="anchor"></a>
+        <section>
+          <h3>Read Tokens</h3>
+
+          <p>
+            Read tokens are what's used to authenticate against the packagecloud repository. In other words, the package manager on your system will send this token along with its requests for repo metadata and packages.
+          </p>
+
+          <p>
+            These tokens are <b>read-only</b>, meaning that they can't be used to modify the repo in any way or authenticate against any packagecloud endpoints aside from the package servers themselves.We recommend using one read token per node to maximize isolation.
+          </p>
+
+          <p>
+            Read tokens are generated automatically by our <a href="#install_repo">repo installation scripts</a>. Our scripts automatically associate read tokens with a node's hostname. If you write your own config management manifests, generating and associating read tokens is a simple matter of making a call to a REST API.
+          </p>
+        </section>
+
+        <a name="revocation" class="anchor"></a>
+        <section>
+          <h3>Revocation</h3>
+
+          <p>
+            If you want to revoke access to one node at a time, you can revoke its read token using the CLI. This is one of the benefits of generating one read-token per node.
+          </p>
+
+          <span class="prelabel">NOTE: Use the master token name and read token name NOT the actual token values</span>
+          <p><!--googleoff: all--><pre>&gt; package_cloud read_token destroy username/reponame master_token_name/read_token_name</pre><!--googleon: all--></p>
+
+          <p>
+            By revoking a master token, you can revoke all of its read token descendents at once, making it straightforward to &mdash; at once &mdash; revoke an entire customer, datacenter, or other logical grouping that exists in your system.
+          </p>
+
+          <span class="prelabel">NOTE: Use the master token name NOT the actual token value</span>
+          <p><!--googleoff: all--><pre>&gt; package_cloud master_token destroy username/reponame master_token_name</pre><!--googleon: all--></p>
+        </section>
+
+
+      <section>
+        <a name="generate_read_token" class="title-anchor"></a>
+        <h3>Generating a Read Token for Private Repo Access</h3>
+
+<p>Generating a read token is a matter of making a REST call to the tokens endpoint for your repository. The following example will generate and return a read token for the private repository.</p>
+<p>The <code>${master_token}</code> in the example is referring to the master token associated to a repository. See <a href="#master_tokens">Master Tokens</a>.</p>
+<p><b>NOTE: The installation scripts provided by packagecloud automatically generate read tokens for private repositories when they're executed. Take a look at the installation instructions for any packagecloud repository.</b></p>
+<!--googleoff: all--><pre>UNIQUE_ID=`hostname -f` && curl -XPOST --data "name=${UNIQUE_ID}" https://${master_token}:@packagecloud.io/install/repositories/${username}/${repository}/tokens.text</pre><!--googleon: all-->
+
+
+      </section>
+
+      </section>
+      <a name="ci" class="title-anchor"></a>
+      <section>
+        <h2>Continuous Integration</h2>
+        <a name="circle_ci" class="anchor"></a>
+        <h3>CircleCI</h3>
+        <section>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/DRLhQcI-3PE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+  <p>To push packages to packagecloud from <a href="https://circleci.com/" target="parent">CircleCI</a> you must:</p>
+    <ol>
+      <li>Set an environment variable named <code>PACKAGECLOUD_TOKEN</code> in your project's settings and the value must match your packagecloud <a href="/api_token">API access token</a>.</li>
+      <li>Create a circle.yml file which installs the package_cloud gem and <a href="/docs#push_pkg">pushes the package</a> to the <a href="/docs#os_distro_version">OS and version of your choice</a>.</li>
+    </ol>
+  <p>For more info on your API access token, please refer to the API Tokens section in <a href="/docs/api#api_tokens">API docs</a>.</p>
+    <span class="prelabel">Just an example; get your real API token <a href="/api_token">here</a>.</span>
+    <!--googleoff: all--><pre class="labeled">PACKAGECLOUD_TOKEN: f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0</pre><!--googleon: all-->
+
+  <span class="prelabel">Example circle.yml file</span>
+  <!--googleoff: all--><pre class="labeled">
+dependencies:
+  pre:
+    - gem install package_cloud
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - package_cloud push <span class="callout nowrap">user/repo/os/version</span> <span class="callout nowrap">/path/to/pkg.ext</span></pre><!--googleon: all-->
+</section>
+
+        <a name="travis" class="anchor"></a>
+        <h3>Travis CI</h3>
+        <section>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/ogYlVUfTgJs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+  <p>To push packages to packagecloud from Travis CI you must:</p>
+  <ol>
+    <li>Set an environment variable named <code>PACKAGECLOUD_TOKEN</code> in your project's settings and the value must match your packagecloud <a href="/api_token">API access token</a>.</li>
+    <li>Create a .travis.yml file which installs the package_cloud gem and <a href="/docs#push_pkg">pushes the package</a> to the <a href="/docs#os_distro_version">OS and version of your choice</a>.</li>
+  </ol>
+  <p>For more info on your API access token, please refer to the API Tokens section in <a href="/docs/api#api_tokens">API docs</a>.</p>
+  <span class="prelabel">Just an example; get your real API token <a href="/api_token">here</a>.</span>
+  <!--googleoff: all--><pre class="labeled">PACKAGECLOUD_TOKEN: f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0</pre><!--googleon: all-->
+
+  <span class="prelabel">Example .travis.yml file</span>
+  <!--googleoff: all--><pre class="labeled">
+before_install:
+  - gem install package_cloud
+
+script:
+  - package_cloud push <span class="callout nowrap">user/repo/os/version</span> <span class="callout nowrap">/path/to/package.ext</span></pre><!--googleon: all-->
+</section>
+
+        <a name="jenkins" class="anchor"></a>
+        <h3>Jenkins</h3>
+        <section>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/G-ldohi6CTA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<p>To push packages to packagecloud from Jenkins you'll need to install and configure the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Packagecloud+Plugin">packagecloud Jenkins plugin</a>.</p>
+<p>The step by step instructions can be found on the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Packagecloud+Plugin">packagecloud Jenkins plugin wiki page</a>.</p>
+<p>There are 3 steps to the configuration process:</p>
+  <ol>
+    <li><a href="https://wiki.jenkins-ci.org/display/JENKINS/Packagecloud+Plugin#PackagecloudPlugin-plugininstall">Plugin installation</a>: begin by finding and installing the Jenkins plugin via the Jenkins UI</li>
+    <li><a href="https://wiki.jenkins-ci.org/display/JENKINS/Packagecloud+Plugin#PackagecloudPlugin-credssetup">Credentials setup</a>: next, use Jenkins' credentials system to store your packagecloud username and API token</li>
+    <li><a href="https://wiki.jenkins-ci.org/display/JENKINS/Packagecloud+Plugin#PackagecloudPlugin-uploadartifacts">Configure post-build job</a>: finally, add a post-build step to your Jenkins job, enter the repository to push to, and select the operating system and version</li>
+  </ol>
+
+  <p>You'll need to use your packagecloud username and API token when configuring credentials in Jenkins.</p>
+    <p>Please log in to packagecloud to view your username and API token.</p>
+</section>
+
+        <a name="buildkite" class="anchor"></a>
+        <h3>Buildkite</h3>
+        <section>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/R2xDk5_WYMc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+  <p>To push packages to packagecloud from Buildkite you must:</p>
+  <ol>
+    <li>Ensure the package_cloud gem is installed in your agent environment</li>
+    <li>Expose the <code>PACKAGECLOUD_TOKEN</code> environment variable in your <a href="https://buildkite.com/docs/agent/securing#using-environment-hooks-for-secrets">Buildkite environment hook</a></li>
+    <li>Add a build script to push your build artifact to packagecloud</li>
+  </ol>
+  <p>For more info on your API access token, please refer to the API Tokens section in <a href="/docs/api#api_tokens">API docs</a>.</p>
+
+    <span class="prelabel">Just an example; get your real API token <a href="/api_token">here</a>.</span>
+    <!--googleoff: all--><pre class="labeled">#!/bin/bash
+
+export PACKAGECLOUD_TOKEN=f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0</pre><!--googleon: all-->
+
+  <span class="prelabel">Example build script that pushes a previously built build artifact to packagecloud:</span>
+  <!--googleoff: all--><pre class="labeled">#!/bin/bash
+
+set -e
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: $0 username/myrepo path/to/package/artifact"
+  exit 1
+fi
+
+# Download package artifact from a previous build step
+buildkite-agent artifact download "$1" .
+
+# Push package to packagecloud
+package_cloud push "$2" "$(basename $1)"
+  </pre><!--googleon: all-->
+
+  <span class="prelabel">Example build pipeline:</span>
+  <p><img srcset="https://assets-production.packagecloud.io/assets/buildkite_w585_h379_2x-10eb50aa8795fc3200e8bfc9868bb53f5a299c89a43b7a215dbc2b480b237694.png 2x" alt="Buildkite user interface showing a step with a Packagecloud upload command" src="https://assets-production.packagecloud.io/assets/buildkite_w585_h379-02f3b63960cf079f0df0318572678a71ad251e98dfc30167235f0b9bd421b538.png" width="585" height="379" /></p>
+</section>
+
+        <a name="github_actions" class="anchor"></a>
+        <h3>GitHub Actions</h3>
+        <section>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/NIvaukTiLlg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+  <p>NOTE: This video shows how to use the <a href='https://github.com/marketplace/actions/upload-package-packagecloud-io'>GitHub Action</a> generously created by our OSS customer, <a href='https://github.com/danielmundi'>Daniel</a> at <a href='https://www.wlanpi.com/'>WLAN-Pi</a> prior to our official one being developed. Please feel free to use it keeping in mind it is not maintained by Packagecloud.</p> 
+  <p><b>The steps on using the <a href='https://github.com/marketplace/actions/push-package-to-packagecloud-io'>official Packagecloud GitHub Action ('push-package-to-packagecloud-io')</a> to push packages is as follows.</b></p>
+    <ol>
+      <li>If needed, download the <a href='https://cli.github.com/'>GitHub CLI</a></li>
+      <li>Create an encrypted secret named <code>PACKAGECLOUD_TOKEN</code> in your GitHub repository and set your packagecloud API token as the value.</a></li>
+        <span class="prelabel">Just an example - login and find your real API token <a href="/api_token">here</a>.</span>
+        <!--googleoff: all--><pre class="labeled">gh secret set PACKAGECLOUD_TOKEN -b"f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0"</pre><!--googleon: all-->
+      <li>Create a .github/workflows directory</li>
+      <li>On the GitHub Actions page, click the 'Use latest version' button and copy the snippet to your .yml file in the above directory. (It can be named anything, for example: upload.yml.)</li> 
+      <li>In that .yml file, copy and modify the appropriate fields below with your package name, username, repository to <a href="/docs#push_pkg">push the package</a> into, <a href="/docs#os_distro_version">OS/version of your choice</a> (if applicable), and API token.</li>
+      <span class="prelabel">Example:</span>
+      <!--googleoff: all--><pre class="labeled">
+      name: dev-ci
+      on: [push]
+      jobs:
+        upload:
+          runs-on: ubuntu-latest
+          steps:
+      ##### MODIFY: Add steps to build package or copy package to github action container
+      #####         so it is available to github action to upload to packagecloud
+            - name: push package to packagecloud.io
+              uses: computology/packagecloud-github-action@v0.6
+              with:
+      ##### MODIFY: Change to packagecloud username, reponame, distro type
+      #####         To understand the available distro type, see https://www.rubydoc.info/gems/package_cloud/#pushing-a-package
+                PACKAGE-NAME: dist/*.tar.gz
+                PACKAGECLOUD-USERNAME: test_user
+                PACKAGECLOUD-REPONAME: test_repo
+                PACKAGECLOUD-DISTRO: python
+                PACKAGECLOUD-TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }<!---->}</pre><!--googleon: all-->
+      <li>Make a commit, push the file to your GitHub repository, and observe the workflow run under the 'Actions' tab from the GitHub UI.</li>
+    </ol>
+</section>
+
+      </section>
+
+
+      <a name="build_tools" class="title-anchor"></a>
+      <section>
+        <h2>Deploying from Build Tools</h2>
+        <a name="maven_deploy" class="anchor"></a>
+        <h3>Maven Deploy</h3>
+        <section>
+  <ol>
+    <li>
+      If you haven't already, add your <a href="/api_token">API token</a> to your local maven settings file located at <code>$HOME/.m2/settings.xml</code>.
+      Optionally, you can encrypt these values for greater security,
+      consult their <a href="https://maven.apache.org/guides/mini/guide-encryption.html">Password Encryption documentation</a> for instructions.
+        <p>Login to packagecloud to view your username and API token.</p>
+    </li>
+    <li>
+      Configure your project's <code>&lt;distributionManagement&gt;</code> to point to your
+      packagecloud.io repository, making sure that the <code>&lt;id&gt;</code> matches the entry we created above with your token. (We are setting
+      our <code>SNAPSHOT</code> and release repositories to the same repository, feel free to use different ones according to your needs).
+        <!--googleoff: all--><pre>
+&lt;distributionManagement&gt;
+  &lt;repository&gt;
+    &lt;id&gt;packagecloud-myrepo&lt;/id&gt;
+    &lt;url&gt;https://packagecloud.io/test-user/myrepo/maven2&lt;/url&gt;
+  &lt;/repository&gt;
+  &lt;snapshotRepository&gt;
+    &lt;id&gt;packagecloud-myrepo&lt;/id&gt;
+    &lt;url&gt;https://packagecloud.io/test-user/myrepo/maven2&lt;/url&gt;
+  &lt;/snapshotRepository&gt;
+&lt;/distributionManagement&gt;
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Deploy your project to packagecloud!
+      <!--googleoff: all--><pre>
+mvn deploy
+</pre><!--googleon: all-->
+
+    </li>
+  </ol>
+</section>
+
+        <a name="lein_deploy" class="anchor"></a>
+        <h3>Leiningen Deploy</h3>
+        <section>
+  <p>Deploying artifacts using the <a href="https://github.com/computology/lein-maven-packagecloud-wagon">lein-maven-packagecloud-wagon</a>:</p>
+  <ol>
+    <li>
+      If you haven't already, add your <a href="/api_token">API token</a> to your local leiningen profiles file located at <code>$HOME/.lein/profiles.clj</code>.
+      Optionally, you can encrypt these values for greater security, consult their <a href="https://github.com/technomancy/leiningen/blob/stable/doc/DEPLOY.md#gpg">GPG documentation</a> for instructions.
+        <p>Login to packagecloud to view your username and API token.</p>
+    </li>
+    <li>
+      Add the dependency to the <code>:plugins</code> section of your project's<code>project.clj</code>.
+      <!--googleoff: all--><pre>
+:plugins [[lein-maven-packagecloud-wagon &quot;0.0.1&quot;]]
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Configure your project's <code>:deploy-repositories</code> to point to your packagecloud.io repository. (We are setting
+      our <code>SNAPSHOT</code> and release repositories to the same repository, feel free to use different ones according to your needs).
+        <!--googleoff: all--><pre>
+:deploy-repositories [[&quot;releases&quot; {:url &quot;packagecloud-https://packagecloud.io/test-user/myrepo&quot;}]
+                      [&quot;snapshots&quot; {:url &quot;packagecloud-https://packagecloud.io/test-user/myrepo&quot;}]]
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Deploy your project to packagecloud.io!
+      <!--googleoff: all--><pre>
+lein deploy
+</pre><!--googleon: all-->
+
+    </li>
+  </ol>
+</section>
+
+        <a name="gradle_deploy" class="anchor"></a>
+        <h3>Gradle Deploy</h3>
+        <section>
+  <p>Deploying artifacts using the <a href="https://docs.gradle.org/current/userguide/maven_plugin.html">Gradle Maven Deployer</a></p>
+  <ol>
+    <li>
+      If you haven't already, add your <a href="/api_token">API token</a> to your local gradle file located at <code>$HOME/.gradle/gradle.properties</code>.
+        <p>Login to packagecloud to view your username and API token.</p>
+    </li>
+    <li>
+      Require the <code>maven</code> plugin in your project's<code>build.gradle</code>.
+      <!--googleoff: all--><pre>
+apply plugin: &#39;maven&#39;
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Setup the <code>deployerJars</code> in the <code>configurations</code> section of your project's<code>build.gradle</code>.
+      <!--googleoff: all--><pre>
+configurations {
+    deployerJars
+}
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Add the dependency to the <code>dependencies</code> section of your project's<code>build.gradle</code>.
+      <!--googleoff: all--><pre>
+dependencies {
+    deployerJars &quot;io.packagecloud.maven.wagon:maven-packagecloud-wagon:0.0.6&quot;
+}
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Configure your project's <code>uploadArchives</code> to point to your packagecloud.io maven repository.
+        <!--googleoff: all--><pre>
+uploadArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+        repository(url: &quot;packagecloud+https://packagecloud.io/test-user/myrepo&quot;) {
+            authentication(password: mavenPassword)
+        }
+    }
+}
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Deploy your project to packagecloud.io!
+      <!--googleoff: all--><pre>
+gradle uploadArchives
+</pre><!--googleon: all-->
+
+    </li>
+  </ol>
+
+  <h4>NOTES:</h4>
+  <p><b>Android Studio/Gradle 4.x.x Users:</b> If you are getting errors like "Unable to detect maven coordinates (groupId, artifactId, version)..." while uploading, you'll need to define the coordinates explicitly inside of <code>uploadArchives</code>, like so:
+  <!--googleoff: all--><pre>
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.groupId = &#39;com.my_group_id&#39;
+        pom.artifactId = &#39;myexamplelibrary&#39;
+        pom.version = &#39;1.0.1-SNAPSHOT&#39;
+        configuration = configurations.deployerJars
+        repository(url: &quot;packagecloud+https://packagecloud.io/test-user/myrepo&quot;) {
+            authentication(password: mavenPassword)
+        }
+    }
+}
+</pre><!--googleon: all-->
+
+  <p>For SNAPSHOT support, just add <code>-SNAPSHOT</code> to your <code>version</code>.
+
+  <p>You might see some "Could not find metadata: maven-metadata.xml" messages fly by; these are not errors and can safely be ignored.</p>
+</section>
+
+        <a name="gradle_maven_publish_deploy" class="anchor"></a>
+        <h3>Gradle Maven Publish Deploy</h3>
+        <section>
+  <p>Deploying artifacts using the <a href="https://docs.gradle.org/current/userguide/maven_plugin.html">Gradle Maven Publish Plugin Deployer</a></p>
+  <ol>
+    <li>
+      Require the <code>java</code> and <code>maven-publish</code> plugins in your project's <code>build.gradle</code>.
+      <!--googleoff: all--><pre>
+[&#39;java&#39;, &#39;maven-publish&#39;].each {
+    apply plugin : it
+}
+</pre><!--googleon: all-->
+    </li>
+    <li>
+      Add your custom <code>group</code> and project <code>version</code>. For SNAPSHOT support, just add <code>-SNAPSHOT</code> to your <code>version</code>.
+      <!--googleoff: all--><pre id="gradle-settings">
+group = &#39;io.packagecloud.sample&#39;
+version = &#39;1.0.0&#39;
+repositories {
+    gradlePluginPortal()
+}
+</pre><!--googleon: all-->
+    </li>
+    <li>
+      Once the appropriate plugins have been applied, you can configure the publications and repositories. Don't forget to add your username and repository name into the <code>url</code>, paste your <a href="/api_token">API token</a> into <code>username</code> and leave <code>password</code> blank.
+      <!--googleoff: all--><pre id="gradle-settings">
+publishing {
+    publications {
+        myPublication(MavenPublication) {
+            // telling gradle to publish project&#39;s jar archive (2)
+            from components.java
+            // telling gradle to publish README file (2)
+            // artifact (&#39;README.txt&#39;) {
+            //     classifier = &#39;README&#39;
+            //     extension  = &#39;txt&#39;
+            // }
+        }
+    }
+    // telling gradle to publish artifact to repo (3)
+    repositories {
+        maven {
+           url &quot;https://packagecloud.io/test_user/test_repository/java/maven2/&quot;
+           credentials {
+               username = &quot;&lt;YOUR_API_TOKEN&gt;&quot;
+               password = &quot;&quot;
+           }
+        }
+    }
+}
+</pre><!--googleon: all-->
+    </li>
+    <li>
+      Deploy your project to packagecloud.io!
+      <!--googleoff: all--><pre id="gradle-settings">
+./gradlew publish
+</pre><!--googleon: all-->
+    </li>
+</section>
+        <a name="sbt_deploy" class="anchor"></a>
+        <h3>SBT Deploy</h3>
+        <section>
+
+  <p>To deploy artifacts using SBT, we'll be wrapping our <a href="https://github.com/computology/maven-packagecloud-wagon">maven-packagecloud-wagon</a> with
+    the <a href="https://github.com/arktekk/sbt-aether-deploy">aether-deploy</a> SBT plugin.
+    <br/>
+    <b>NOTE:</b> You must have at least <a href="http://www.scala-sbt.org/download.html">SBT 0.13.8</a> installed.</p>
+  <ol>
+    <li>
+      If you haven't already, add your <a href="/api_token">API token</a> to your local ivy credentials file located at <code>$HOME/.ivy2/.credentials</code>.
+        <p>Login to packagecloud to view your username and API token.</p>
+    </li>
+    <li>
+      Add the plugin dependency to a <code>project/plugins.sbt</code> file in your project. (Create file if neccesary).
+      <!--googleoff: all--><pre>
+addSbtPlugin(&quot;no.arktekk.sbt&quot; % &quot;aether-deploy&quot; % &quot;0.20.0&quot;)
+libraryDependencies += &quot;io.packagecloud.maven.wagon&quot; % &quot;maven-packagecloud-wagon&quot; % &quot;0.0.6&quot;
+</pre><!--googleon: all-->
+
+      <p><b>NOTE:</b> Only works with Java 8 or above, for Java 7 you'll have to use <code>"aether-deploy" % "0.17"</code>, which does not support SBT 1.1.x</p>
+    </li>
+    <li>
+      Paste the following block of code towards the bottom of your <code>build.sbt</code> file. This configures the credentials path and sets
+      the publishing destination for our artifacts.
+        <!--googleoff: all--><pre>
+import aether.AetherKeys._
+
+credentials += Credentials(Path.userHome / &quot;.ivy2&quot; / &quot;.credentials&quot;)
+
+aetherWagons := Seq(aether.WagonWrapper(&quot;packagecloud+https&quot;, &quot;io.packagecloud.maven.wagon.PackagecloudWagon&quot;))
+
+publishTo := {
+  Some(&quot;packagecloud+https&quot; at &quot;packagecloud+https://packagecloud.io/test-user/myrepo&quot;)
+}
+</pre><!--googleon: all-->
+
+    </li>
+    <li>
+      Deploy your project to packagecloud!
+      <!--googleoff: all--><pre>
+sbt aether-deploy
+</pre><!--googleon: all-->
+
+    </li>
+  </ol>
+</section>
+
+      </section>
+
+      <a name="maven-metadata" class="title-anchor"></a>
+
+      <section>
+        <h2>Maven Metadata</h2>
+        <section>
+          <p>Maven-metadata XML file stores information that can help software developers quickly understand the history and current state of their java artifacts and use this information to integrate their software with different tools.</p>
+          <a name="where-to-maven-metadata" class="anchor"></a>
+          <h3>Where to get it?</h3>
+          <p>You can access the maven-metadata.xml file of a java package hosted in a public repository using the following URL pattern.
+            <!--googleoff: all--><pre>https://packagecloud.io/example-username/example-repository-name/maven2/example-group/example-package-name-without-version/maven-metadata.xml </pre><!--googleon: all--> </li>
+          <p>
+          <p> If you want to access the maven-metadata.xml file of a java package hosted in a private repository you would need to pass the master token of that repository through the URL as shown in the following URL pattern.
+              <!--googleoff: all--><pre>https://packagecloud.io/priv/example-repository-master-token/example-username/example-repository-name/maven2/example-group/example-package-name-without-version/maven-metadata.xml </pre><!--googleon: all--> </li>
+              You can learn more about master tokens <a href="#master_tokens">here</a>.
+          </p>
+          <span class="prelabel">NOTE: maven-metadata xml file will only be rendered if all the version names of your package comply with the Semantic Versioning <a href="https://semver.org/">specifications</a>.</span>
+        </section>
+      </section>
+
+      <a name="cli" class="title-anchor"></a>
+
+      <section>
+        <h2>Command Line Client</h2>
+        <a name="cli_install" class="anchor"></a>
+        <section>
+          <p>You can find additional documentation about the packagecloud command line <a href="http://www.rubydoc.info/gems/package_cloud/">here</a> and
+             by running <tt>package_cloud help</tt>.</p>
+          <h3>Installation</h3>
+          <p>
+            Once you get the <tt>package_cloud</tt> CLI tool installed, you can create repositories and push packages quickly and easily.
+          </p>
+
+          <ol>
+            <li>If you don't already have Ruby, you need to install it. You can find install instructions for most platforms <a href="https://www.ruby-lang.org/en/documentation/installation/">here</a>.</li>
+            <li>Install the <tt>package_cloud</tt> Ruby gem by running: <!--googleoff: all--><pre>&gt; sudo gem install package_cloud </pre><!--googleon: all--> </li>
+          </ol>
+
+          <p>The <tt>package_cloud</tt> CLI has built-in help that can be accessed by running: <!--googleoff: all--><pre>&gt; package_cloud help</pre><!--googleon: all--></p>
+        </section>
+
+        <a name="manual_pcloud_file" class="anchor"></a>
+
+        <section>
+          <h3>Creation of .packagecloud file</h3>
+          <p><code id="code">$HOME/.packagecloud</code> allows <tt>package_cloud</tt> CLI to authenticate your session and check your permissions. There are two ways to set this file up</p>
+          <h4>Manual creation</h4>
+          <ol>
+            <li><p>Go to <a href="https://packagecloud.io/api_token">https://packagecloud.io/api_token</a> and copy the auto-generated settings.<p></li>
+            <li><p>Save the content into a new file in your <code>$HOME</code> directory.</p>
+              <span class="prelabel">Just an example; get your real settings <a href="/api_token">here</a>.</span>
+              <!--googleoff: all--><pre class="labeled">echo '{"url":"https://packagecloud.io/", "token": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0"}'' >> ~/.packagecloud</pre><!--googleon: all-->
+            </li>
+          </ol>
+          <h4>Direct download</h4>
+          <p>You can also download the configuration file directly from the site if you click the download button in <a href="https://packagecloud.io/api_token">https://packagecloud.io/api_token</a>, don't forget to rename this file to <tt>.packagecloud</tt> and move it from your downloads to your <code>$HOME</code> directory.</p>
+        </section>
+
+        <a name="create_repo" class="anchor"></a>
+
+        <section>
+          <h3>Creating repos</h3>
+
+          <p>There are two ways to create a new repo:</p>
+
+          <ol>
+            <li>Using the web UI: <a href="https://packagecloud.io/repositories/new">https://packagecloud.io/repositories/new</a></li>
+            <li>Using the <tt>package_cloud</tt> CLI: <!--googleoff: all--><pre>&gt; package_cloud repository create <i>myrepo</i></pre><!--googleon: all--></li>
+          </ol>
+
+          <p>If your <a href="https://packagecloud.io/pricing">plan</a> allows you to create private repos, you can create one by:</p>
+
+          <ol>
+            <li>Selecting <i>Private</i> in the web UI on the repo create page: <a href="https://packagecloud.io/repositories/new">https://packagecloud.io/repositories/new</a></li>
+            <li>Passing a flag to the <tt>package_cloud</tt> CLI: <!--googleoff: all--><pre>&gt; package_cloud repository create <i>myrepo</i> --private</pre><!--googleon: all--></li>
+          </ol>
+        </section>
+
+        <a name="push_pkg" class="anchor"></a>
+
+        <section>
+          <h3>Pushing packages</h3>
+          <p>You can push a package using the <tt>package_cloud</tt> CLI:</p>
+          <p>
+            <!--googleoff: all--><pre>&gt; package_cloud push username/<i>myrepo</i> /path/to/packagefile</pre><!--googleon: all-->
+          </p>
+          <p>Some package types can be associated to specific versions of particular Linux distributions. If the package type you are pushing needs to be associated with a particular version you will be prompted by the <tt>package_cloud</tt> CLI.</p>
+          <p>You can also specify the version in the command line, for example, to push a package to Ubuntu 12.04 Precise, you would use:</p>
+          <!--googleoff: all--><pre>&gt; package_cloud push username/<i>reponame</i>/ubuntu/precise /path/to/packagefile</pre><!--googleon: all-->
+
+          <h4>Supplying/Overriding Maven Coordinates</h4>
+          <p>Sometimes (like for "fatjars"), we are unable to automatically detect the maven coordinates for a particular package, so you'll have to supply it on the command line like so:
+          <!--googleoff: all--><pre>&gt; package_cloud push username/<i>reponame</i>/java /path/to/package.jar --coordinates=com.mygroup:packagename:1.0.2</pre><!--googleon: all-->
+
+          <h4>Uploading multiple packages and skipping errors</h4>
+          <p>You may upload an entire directory of packages using a glob:</p>
+          <p>
+            <!--googleoff: all--><pre>&gt; package_cloud push username/<i>myrepo</i> /path/*.rpm</pre><!--googleon: all-->
+          </p>
+          <p>If you attempt to re-run this command after additional packages to the directory, it will fail once it tries to upload a package that already exists. You can use the <tt>--skip-errors</tt>
+          flag to force the CLI to skip packages that that already exist and proceed to the next package:</p>
+          <p>
+            <!--googleoff: all--><pre>&gt; package_cloud push username/<i>myrepo</i> /path/*.rpm --skip-errors</pre><!--googleon: all-->
+          </p>
+        </section>
+
+        <a name="yank_pkg" class="anchor"></a>
+        <section>
+          <h3>Yanking packages (Delete a package)</h3>
+          <p>You can remove a package from a repo by using the <tt>package_cloud</tt> CLI:</p>
+          <p>
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/<i>myrepo</i>/[distro/version] packagename.ext</pre><!--googleon: all-->
+          </p>
+          <p>The <tt>packagename.ext</tt> must be the full filename of the package, including the extension.</p>
+          <p>Some packages (RPMs, Debs, Python packages, Node.js, and JARs) are pushed to a specific distribution and version. When those packages are removed, the distribution and version that should be removed must be specified.</p>
+          <p>Other package types (RubyGems) can be removed without specifying a distribution or version, as these do not apply to RubyGem packages.</p>
+          <h3>Examples</h3>
+          <p>Remove a package called <tt>jake-1.0-2.src.rpm</tt> from a CentOS 6 repo named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/myrepo/el/6 jake-1.0-2.src.rpm</pre><!--googleon: all--></p>
+          <p>Remove a package called <tt>redis_2.8.1-1_amd64.deb</tt> from an Ubuntu Precise (12.04) repo named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/myrepo/ubuntu/precise redis_2.8.1-1_amd64.deb</pre><!--googleon: all--></p>
+          <p>Remove a package called <tt>packagecloud_test-0.0.1.whl</tt> from a Python repo named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/myrepo/python packagecloud_test-0.0.1.whl</pre><!--googleon: all--></p>
+          <p>Remove a package called <tt>passenger-4.0.43.gem</tt> from a RubyGem repo named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/myrepo passenger-4.0.43.gem</pre><!--googleon: all--></p>
+          <p>Remove a package called <tt>jake-2.3.jar</tt> with the group <tt>com.groupid</tt>from a Maven repo named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/myrepo/java com.groupid/jake-2.3.jar</pre><!--googleon: all--></p>
+          <p>Remove a package called <tt>packagecloud-1.0.1.tgz</tt> from an npm registry named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/myrepo/node packagecloud-1.0.1.tgz</pre><!--googleon: all--></p>
+          <p>Remove a scoped package called <tt>packagecloud-1.0.1.tgz</tt> from an npm registry named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud yank username/myrepo/node @computology/packagecloud-1.0.1.tgz</pre><!--googleon: all--></p>
+        </section>
+
+        <a name="promote_pkg" class="anchor"></a>
+        <section>
+          <h3>Promoting packages (Move a package)</h3>
+          <p>You can move a package to a different epo by using the <tt>package_cloud</tt> CLI:</p>
+          <p>
+            <!--googleoff: all--><pre>&gt; package_cloud promote username/<i>myrepo</i>/[distro/version] packagename.ext username/<i>destination_repo</i></pre><!--googleon: all-->
+          </p>
+          <p>The <tt>packagename.ext</tt> must be the full filename of the package, including the extension.</p>
+          <p>Some packages (RPMs, Debs, Python packages, and JARs) are pushed to a specific distribution and version. When those packages are moved, the distribution/version must be specified and they will be moved to the same distribution/version in the destination repository.</p>
+          <p>Other package types (RubyGems and npm packages) can be moved without specifying a distribution or version, as these do not apply to RubyGem or npm packages.</p>
+          <p>Both repository owners and collaborators may move packages between repositories.</p>
+          <p>This operation is a move, not a copy, thus the source repository will no longer have a copy of the package when the operation has completed. Note that the download statistics
+          for the moved package will be cleared.</p>
+          <h3>Examples</h3>
+          <p>Move a packaged called <tt>jake-1.0-2.src.rpm</tt> from a CentOS 6 repo name <tt>myrepo</tt> to <tt>repo2</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud promote username/myrepo/el/6 jake-1.0-2.src.rpm username/repo2</pre><!--googleon: all--></p>
+          <p>Move a package called <tt>redis_2.8.1-1_amd64.deb</tt> from an Ubuntu Precise (12.04) repo named <tt>myrepo</tt> to <tt>repo2</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud promote username/myrepo/ubuntu/precise redis_2.8.1-1_amd64.deb username/repo2</pre><!--googleon: all--></p>
+          <p>Move a package called <tt>packagecloud_test-0.0.1.whl</tt> from a Python repo named <tt>myrepo</tt> to <tt>repo2</tt>:
+              <!--googleoff: all--><pre>&gt; package_cloud promote username/myrepo/python packagecloud_test-0.0.1.whl username/repo2</pre><!--googleon: all--></p>
+          <p>Move a package called <tt>passenger-4.0.43.gem</tt> from a RubyGem repo named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud promote username/myrepo passenger-4.0.43.gem username/repo2</pre><!--googleon: all--></p>
+          <p>Move a package called <tt>packagecloud-1.0.1.tgz</tt> from an npm registry named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud promote username/myrepo/node packagecloud-1.0.1.tgz username/repo2</pre><!--googleon: all--></p>
+          <p>Move a scoped package called <tt>@computology/packagecloud-1.0.1.tgz</tt> from an npm registry named <tt>myrepo</tt>:
+            <!--googleoff: all--><pre>&gt; package_cloud promote username/myrepo/node @computology/packagecloud-1.0.1.tgz username/repo2</pre><!--googleon: all--></p>
+        </section>
+
+        <a name="install_repo" class="anchor"></a>
+        <section>
+          <h3>Installing a repo</h3>
+          <p>There are two methods you can use to install a repo:</p>
+          <ol>
+            <li>You can visit the repo page and click the installation tab on the left side to get Bash scripts, a Chef cookbook, a Puppet module, and manual installation instructions.</li>
+            <li>You can also use the <tt>package_cloud</tt> command line client. You will need to specify the type of repo you want installed on your system (deb, rpm, or gem). For example, to install a deb repo you would run: <!--googleoff: all--><pre>&gt; package_cloud repository install username/<i>reponame</i> deb</pre><!--googleon: all--></li>
+          </ol>
+        </section>
+
+        <a name="os_distro_version" class="anchor"></a>
+        <section>
+          <h3>OS versions for pushing and yanking packages</h3>
+          <p>When pushing or yanking a package you can specify an OS and a version. If you do not specify one, the command line client will
+            walk you through choosing the correct OS and version.</p>
+          <p>The following table shows the OS and version strings that are valid for pushing and yanking: </p>
+          <h3>RubyGems</h3>
+          <p>No OS or version is required. RubyGem packages may be pushed like this:</p>
+          <!--googleoff: all--><pre>package_cloud push user/repo example-1.0.1.gem</pre><!--googleon: all-->
+          <h3>Node.js</h3>
+          <p>npm packages may be pushed like this:</p>
+          <!--googleoff: all--><pre>package_cloud push user/repo/node example-1.0.1.tgz</pre><!--googleon: all-->
+
+          <h3>Python</h3>
+          <p>Python wheels, eggs, and source distributons can be pushed by specifying <code>python</code>. Python packages may be pushed like this:</p>
+          <!--googleoff: all--><pre>package_cloud push user/repo/python example-1.0.1.whl</pre><!--googleon: all-->
+          <a class="docs-anchor" name="amazon-info"></a>
+          <h3>Amazon Linux</h3>
+          <p>Packages for Amazon Linux must use the string for <a href="#anchor-el">Enterprise Linux 6</a> (el/6) when pushing, or yanking, from a packagecloud repository.</p>
+          <!--googleoff: all--><pre>package_cloud push user/repo/el/6 amz-linux-package-1.0-2.el6.x86_64.rpm</pre><!--googleon: all-->
+          <!--googleoff: all--><pre>package_cloud yank user/repo/el/6 amz-linux-package-1.0-2.el6.x86_64.rpm</pre><!--googleon: all-->
+          <div class="distros-container" ng-repeat="(key, value) in distros | groupBy: 'distro_name'" ng-if="!pythonOrNode(key)">
+            <a class="docs-anchor" href="{{ distAnchor(value[0]['os_dist']) }}" name="{{ distAnchorName(value[0]['os_dist']) }}">
+              <h3>{{key}}</h3>
+            </a>
+            <table width="320" class="table-minimal">
+              <thead>
+                <tr>
+                  <th>Version</th>
+                  <th>Push/Yank string</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in value | orderBy: 'id' ">
+                  <td ng-bind-html="amzInfoLink(item)"></td>
+                  <td>{{ item.os_dist }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <br />
+            <p><i>Example: pushing a package to {{ value[0]["display_name"] }}:</i></p>
+            <!--googleoff: all--><pre>package_cloud push user/repo/{{value[0]["os_dist"]}} {{ packageFileName(value[0]["package_type"]) }}</pre><!--googleon: all-->
+            <br />
+            <p><i>Example: yanking a package from {{ value[0]["display_name"] }}:</i></p>
+            <!--googleoff: all--><pre>package_cloud yank user/repo/{{value[0]["os_dist"]}} {{ packageFileName(value[0]["package_type"]) }}</pre><!--googleon: all-->
+          </div>
+        </section>
+      </section>
+
+      <a name="sso" class="title-anchor"></a>
+
+      <section>
+        <h2>SSO</h2>
+        <section>
+          <a name="sso_requirements" class="title-anchor"></a>
+          <h3>Requirements</h3>
+          <hr />
+
+<h3>In your identity management service</h3>
+<p>To implement SSO login with packagecloud, customers must create a new application in their identity management service (Okta, Google Admin etc.), with the following details:</p>
+
+<ol>
+  <li>
+    <h4>ACS URL:</h4>
+    <!--googleoff: all--><pre>https://dev-px9pgfj4.us.auth0.com/login/callback?connection={email_domain}</pre><!--googleon: all-->
+    <p><i>Example: If the email domain is <code>packagecloud.io</code>, the URL should be: <code>https://dev-px9pgfj4.us.auth0.com/login/callback?connection=packagecloudio</code> (without '.')</i></p>
+  </li>
+
+  <li>
+    <h4>Entity ID:</h4>
+    <!--googleoff: all--><pre>urn:auth0:dev-px9pgfj4:{email_domain_no_special_chars}</pre><!--googleon: all-->
+    <p><i>Example: <code>urn:auth0:dev-px9pgfj4:packagecloudio</code> (without '.')</i></p>
+  </li>
+
+  <li>
+    <h4>Add mapping attribute:</h4>
+    <p>Please map your <code>email</code> attribute to an app attribute called <code>email</code>.</p>
+    <p>In some cases the default email field has a prefix, so we are normalizing it. For instance: <code>primary_email</code> &#8594; <code>email</code></p>
+  </li>
+</ol>
+
+<h3>Update packagecloud admins</h3>
+<p><b>To enable SSO-login to packagecloud, please send these details to our team member you are in contact with, or <a href="mailto: support@packagecloud.io">support@packagecloud.io</a>:</b></p>
+  <ol>
+    <li>Your application's SSO URL,</li>
+    <li>Your application's x509 certificate file,</li>
+    <li>The SSO login-enabled person's/people's email (used to register with packagecloud),</li>
+    <li>Whether the user is an SSO admin (if applicable)</li>
+  </ol>
+<p>We appreciate your patience whilst our admins confirm the details and update the user's account.</p>
+        </section>
+        <section>
+          <a name="okta" class="title-anchor"></a>
+          <h3>Okta</h3>
+          <hr />
+
+<h3>Okta Configuration</h3>
+<p>The following steps should be completed by an Admin user of your Okta account in the Admin UI.</p>
+
+<h3>Settings for creating a new SAML 2.0 Application</h3>
+<ul>
+  <li>
+    <p><b>Single sign on URL</b></p>
+    <!--googleoff: all--><pre>https://dev-px9pgfj4.us.auth0.com/login/callback?connection={email_domain}</pre><!--googleon: all-->
+    <p><i>Example: If the email domain is <code>packagecloud.io</code>, the URL should be: <code>https://dev-px9pgfj4.us.auth0.com/login/callback?connection=packagecloudio</code></i> (without '.')</p>
+  </li>
+
+  <li>
+    <p><b>Entity ID</b></p>
+    <!--googleoff: all--><pre>urn:auth0:dev-px9pgfj4:{email_domain_no_special_chars}</pre><!--googleon: all-->
+    <p><i>Example: <code>urn:auth0:dev-px9pgfj4:packagecloudio</code> (without '.')</i></p>
+  </li>
+  
+  <li>
+    <p><b>Name ID format:</b> <code>Unspecified</code></p>
+  </li>
+  
+  <li>
+    <p><b>Application username:</b> <code>Email</code></p>
+  </li>
+
+  <li>
+    <p><b>Attribute Statements:</b></p>
+      <ul>
+        <li>Name: <code>email</code></li>
+        <li>Name format: <code>Unspecified</code></li>
+        <li>Value: <code>user.email</code></li>
+      </ul>
+  </li>
+</ul>
+
+<h3>Add/assign new users to the account</h3>
+<ol>
+  <li>
+    <p><b>Create a new Person</b></p>
+    <p>In Directory (side nav) &#8594; People: Click the 'Add Person' button, enter the details, check the 'Send user activation email now' box and Save.</p>
+    <p>NOTE: The inputted email should match the email used to register their packagecloud account.</p>
+    <p>They will receive an email with prompts to create an account in Okta, and their Status will remain as 'Pending user action' until complete.</p>
+  </li>
+
+  <li>
+    <p><b>Assign the user to the application</b></p>
+    <p>When the new user's Status is confirmed 'Active', go to your Application's Assignments (Applications (side nav) &#8594; Applications &#8594; &lt;your_app_name&gt; &#8594; Assignments), click the 'Assign' button, and 'Assign to People' from the dropdown menu.</p>
+    <p>Select the user, click 'Assign' next to their name.</p>
+    <p>Confirm the correct User Name, which should be the email used to register their packagecloud account, click 'Save and Go Back'.</p>
+  </li>
+</ol>
+
+<h3>Update packagecloud admins</h3>
+<p><b>To enable SSO-login to packagecloud, please send these details to our team member you are in contact with, or <a href="mailto: support@packagecloud.io">support@packagecloud.io</a>:</b></p>
+  <ol>
+    <li>Your application's Identity Provider Single Sign-On URL,</li>
+    <li>Your application's x509 certificate file,</li>
+    <li>The SSO login-enabled person's/people's email (used to register with packagecloud),</li>
+    <li>Whether the user is an SSO admin (if applicable)</li>
+  </ol>
+<p>The first two can be confirmed in the Okta Admin UI under Applications (side nav) &#8594; Applications &#8594; &lt;your_app_name&gt; &#8594; Sign On &#8594; View Setup Instructions</p>
+<p>We appreciate your patience whilst our admins confirm the details and update the user's account.</p>
+        </section>
+
+      </section>
+
+      <section>
+        <h2>Billing & Pricing</h2>
+        <section>
+          <a name="pricing" class="title-anchor"></a>
+          <p>Please refer to our <a href="/pricing/faq">Billing & Pricing FAQ</a> for detailed info.</p>
+        </section>
+      </section>
+
+      <a name="troubleshooting" class="title-anchor"></a>
+      <section>
+      <h2>Troubleshooting</h2>
+        <br/>
+        <a name="package_not_found" class="anchor"></a>
+        <section>
+          <h3>Package not found</h3>
+          <p>There are two main reasons why this can happen: there are <a href="#no_available_packages">unavailable packages</a> suitable for your system, OR your system contains <a href="#stale_cached_metadata">stale cached package metadata.</a></p>
+          <ol>
+            <a name="no_available_packages" class="anchor"></a>
+            <li><b>No available packages suitable for your system</b></li>
+            <p>This happens because there is a mismatch between the attributes of the available packages and the attributes of the system that is trying to install those packages. Four of the most common mismatches are as follows:</p>
+            <ul>
+              <p><b>In these first two cases, we recommend to contact the respository owner directly for further support:</b></p>
+              <li><b>No packages for the architecture:</b> For example, only packages with the architecture 'amd64' is available in the repository, but the system has the architecture 'i386'.</li>
+              <li><b>Unavailable package format:</b> For example, there are only RPM packages in the repository but the client system uses the DEB package format.</li>
+              <p><b>These two cases can <i>potentially</i> be resolved by <a href="#force_os_dist_package_not_found">forcing the os/dist</a> when running the repository installation script to generate repo config files for a distribution or version, which the package you intend to install is available for, and that distribution or version is also compatible to the system:</b></p>
+              <li><b>Unavailable distribution:</b> For example, only Ubuntu packages are available in the repository, but the client system is running LinuxMint.</li>
+              <li><b>Distribution version mismatch:</b> For example, only Ubuntu/Precise packages are available in the repository, but the client system is running Ubuntu/Jammy.</li>
+              <a name="force_os_dist_package_not_found" class="anchor"></a>
+              <h4>Forcing the os/dist when installing the repository:</h4>
+              <p>The following steps refer to Debian packages, but the general process can be applied for other package types (like RPM) too.</p>
+              <p><i>For example: I am running an Ubuntu/Jammy machine and I wish to install a Debian test package from the <a href="https://packagecloud.io/Computology/packagecloud-test-packages">packagecloud-test-packages repository</a>.</i></p>
+              <ol>
+                <li><b>Double check the repository to confirm the available os/dist</b></li>
+                <p>Currently the <a href="https://packagecloud.io/Computology/packagecloud-test-packages">packagecloud-test-packages repository</a> has a Debian package uploaded only for <code>Ubuntu/Precise</code> NOT <code>Ubuntu/Jammy</code>.</p>
+                <li><b>Download the installation script</b></li>
+                <p>The repository installation script command can be found by clicking on the package in the repository, e.g., <a href="https://packagecloud.io/Computology/packagecloud-test-packages/packages/ubuntu/precise/packagecloud-test_1.1-2_amd64.deb">packagecloud-test-package for <code>Ubuntu/Precise</code></a>. Depending on the package type, it may differ from the below.</p>
+                <!--googleoff: all--><pre>curl -s https://packagecloud.io/install/repositories/Computology/packagecloud-test-packages/script.deb.sh > script.sh</pre><!--googleon: all-->
+                <li><b>Make the script executable</b></li>
+                <!--googleoff: all--><pre>chmod 755 script.sh</pre><!--googleon: all-->
+                <li><b>Specify a supported os/dist when running the script to force the repository installation</b></li>
+                <p>As the Debian package I wish to install has only been uploaded for <code>Ubuntu/Precise</code>, I will set them as the os and dist variables prior to running the script.</p>
+                <!--googleoff: all--><pre>os=ubuntu dist=precise ./script.sh</pre><!--googleon: all-->
+                <li><b>Running the installation command will then install the available package for the specified version</b></li>
+                <!--googleoff: all--><pre>sudo apt-get install packagecloud-test=1.1-2</pre><!--googleon: all-->
+              </ol>
+            </ul>
+            <a name="stale_cached_metadata" class="anchor"></a>
+            <li><b>Stale cached package metadata on your system</b></li>
+            <ul>
+              <li><b>APT</b></li>
+                <p>You can update it by running:
+                    <!--googleoff: all--><pre>sudo apt-get clean && sudo apt-get update</pre><!--googleon: all--></p>
+              <li><b>YUM</b></li>
+              <p>You can refresh it by running
+                  <!--googleoff: all--><pre>sudo yum clean all && sudo yum update</pre><!--googleon: all-->
+                You can also set
+                    <!--googleoff: all--><pre>metadata_expires=[time in seconds]</pre><!--googleon: all-->
+                in your repository config (found in /etc/yum/yum.repos.d/) to smaller value to allow for YUM to automatically refresh
+                the metadata. See the man page (man 5 yum.conf) for more information.</p>
+            </ul>
+          </ol>
+        </section>
+        <a name="unable_to_download_repo_config" class="anchor"></a>
+        <section>
+          <h3>Unable to download repo config</h3>
+          <p>You may encounter this error when attempting to run the repository installation script:</p>
+          <pre>Unable to download repo config from: <!--googleoff: all-->https://packagecloud.io/install/repositories/username/reponame/config_file.list?o
+s=OS&dist=DIST&source=script<!--googleon: all-->
+
+This usually happens if your operating system is not supported by
+packagecloud.io, or this script's OS detection failed.
+
+You can override the OS detection by setting os= and dist= prior to running this script.
+You can find a list of supported OSes and distributions on our website: https://packagecloud.io/docs#os_distro_version
+
+For example, to force Ubuntu Trusty: os=ubuntu dist=trusty ./script.sh</pre>
+          <p>This error typically means Packagecloud currently does not know how to create the repo config for your system. Perhaps you are using a <a href="#os_distro_version">supported OS</a> but with a newly released version that we are in the process of implementing. Or, you may be running an OS/dist which Packagecloud does not yet automatically detect.</p>
+          <a name="force_os_dist_repo_config" class="anchor"></a>
+          <h4>How to resolve this:</h4>
+          <p>The following steps refer to Debian packages, but the general process can be applied for other package types (like RPM) too.</p>
+          <p><i>For example: Hypothetically if Packagecloud had not yet added support for <code>Debian/Bullseye</code> running on my machine and I wish to install the <a href="https://packagecloud.io/Computology/packagecloud-test-packages">packagecloud-test-packages repository</a>.</i></p>
+          <ol>
+            <li><b>Download the installation script</b></li>
+            <p>The repository installation script command can be found by clicking on the package in the repository, e.g., <a href="https://packagecloud.io/Computology/packagecloud-test-packages/packages/ubuntu/precise/packagecloud-test_1.1-2_amd64.deb">packagecloud-test-package for <code>Ubuntu/Precise</code></a>. Depending on the package type, it may differ from the below.</p>
+            <!--googleoff: all--><pre>curl -s https://packagecloud.io/install/repositories/Computology/packagecloud-test-packages/script.deb.sh > script.sh</pre><!--googleon: all-->
+            <li><b>Make the script executable</b></li>
+            <!--googleoff: all--><pre>chmod 755 script.sh</pre><!--googleon: all-->
+            <li><b>Specify a supported os/dist to force the installation when running the script</b></li>
+            <p>I can set the <code>os</code> and <code>dist</code> variables to a Packagecloud supported os/dist as similar as possible to my system. To avoid future potential <a href="#package_not_found">'package not found' errors</a>, I have set it to match the os/dist of an available package in the repository (Ubuntu/Precise).</p>
+            <!--googleoff: all--><pre>os=ubuntu dist=precise ./script.sh</pre><!--googleon: all-->
+          </ol>
+        </section>
+
+        <a name="gdpr" class="anchor"></a>
+        <section>
+          <h3>GDPR</h3>
+          <p>
+          The General Data Protection Regulation (GDPR) is a new European data protection regulation
+          adopted by the EU Commission, which aims to strengthen the security of personal data.
+          </p>
+          <p>
+          Below is some information about the steps Packagecloud is taking to meet the GDPR
+          requirements, and how we are working with our EU customers to help them meet their
+          compliance obligations.
+          </p>
+        </section>
+        <a name="controller_processor" class="anchor"></a>
+        <section>
+          <h3>Is Packagecloud a data controller or data processor?</h3>
+          <p>
+          In general, Packagecloud is a data controller for personal data derived on its website, and
+          personal information such as contact information collected directly from our EU customers.
+          </p>
+          <p>
+          Packagecloud is a data processor when its EU customers collect the personal information of
+          their employees or customers and upload that personal data to their Packagecloud account. In
+          this case, the EU customer is the data controller for that personal information.
+          </p>
+        </section>
+        <a name="customer_controller" class="anchor"></a>
+        <section>
+          <h3>What are customers’ responsibilities as a data controller?</h3>
+          <p>
+          EU customers who have collected the personal information of their employees or customers
+          need to ensure that they have legal consent of those parties under the GDPR, and that there is
+          an adequate level of protection for that data exported out of the EU.
+          </p>
+        </section>
+        <a name="customer_dpa" class="anchor"></a>
+        <section>
+          <h3>Does Packagecloud have a Customer DPA?</h3>
+          <p>
+          Yes, it does. Contact us at <a href="mailto:support@packagecloud.io">support@packagecloud.io</a>
+          and it will be provided to you. Also Packagecloud enters into standard contractual clauses with EU
+          customers upon request.
+          </p>
+        </section>
+      </section>
+    </div>
+  </div>
+</div>
+
+    </main>
+    <script type="text/javascript">
+var PackageCloud = {
+  publishable_stripe_key: 'pk_live_XFXh9vEw0BpmMZb13wMgNAXI',
+  google_maps_api_token: ''
+};
+</script>
+    
+    <!-- Only load the billing history js on the billing
+         history page and only after jquery ($) has loaded -->
+    
+    <div id="cookie-popover" class="cookie-popover" style="display:none;">
+  <p>We use cookies to enhance the user experience on packagecloud.<br>By using our site, you acknowledge that you have read, understand, and agree to our <br> <a href="https://packagecloud.io/legal/cookies">Cookie Policy</a>, <a href="https://packagecloud.io/legal/privacy">Privacy Policy</a>, and our <a href="https://packagecloud.io/legal/tos">Terms of Service</a>.<br> By continuing to browse this site you are agreeing to our use of cookies.</p>
+  <div class="button-container">
+    <a href="javascript:;" onclick="closeCookiePopover()" id="cookie-consent" class="btn close"><span class="glyphicon glyphicon-ok"></span></a>
+  </div>
+</div>
+  </body>
+</html>
